@@ -1,0 +1,52 @@
+# Here you can define credentials for different data sets and environment.
+
+# Here you can define training and inference configuration for training and inference pipeline.
+
+# Example:
+[environment]
+device = 'cuda'
+sample_num = 50  # number data sampled when sampling dataset_unlabeled,
+# then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
+max_trajectory = 5000  # number of steps per each episode
+check_num = 15  # threshold of confidence
+reward_list = [1.0, -2.0, 0.5, -0.5, 0.1, 4.0]  # rewards used in calculating reward
+strategy_distribution = [0.2, 0.1, 0.2, 0.5]  # probability distribution used to choose sampling strategy
+sampling_method_distribution = [0.17, 0.17, 0.16, 0.5]  # probability distribution used to choose unsupervised method
+
+[hyperparameters]
+min_steps_before_learning=25000
+batch_size=128
+update_every_n_steps=128
+learning_updates_per_learning_session=128
+add_extra_noise=false
+discount_rate=0.99
+num_episodes_to_run = 10   # episodes per training
+device = 'cuda'
+
+[hyperparameters.Actor]
+learning_rate=0.0005
+linear_hidden_units=[32, 16]
+final_layer_activation="Softmax"
+batch_norm=false
+tau=0.2
+gradient_clipping_norm=5
+initialiser="Xavier"
+[hyperparameters.Critic]
+learning_rate=0.0005
+linear_hidden_units=[32, 16]
+final_layer_activation="None"
+batch_norm=false
+buffer_size=100000
+tau=0.2
+gradient_clipping_norm=5
+initialiser="Xavier"
+
+
+[INFERENCE]
+MODEL_DIR = "/models/dummy.p"
+OUTPUT_DIR = "/data/output/inference.csv"
+# test1 = [1,2,3,4,5]
+# test2 = {k = "v",name = "dw"}
+
+
+
