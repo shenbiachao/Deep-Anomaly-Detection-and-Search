@@ -20,7 +20,7 @@ class ad(gym.Env):
             train_df.iloc[black_len:black_len + white_len, :-1].values.astype(float)).float().to(device)
         dataset_u = torch.tensor(train_df.iloc[black_len + white_len:, :-1].values.astype(float)).float().to(
             device)
-        print("Anomaly num: ", len(dataset_a), "   Unlabeled num: ", len(dataset_u), "Normal num: ", len(dataset_n))
+        # print("Anomaly num: ", len(dataset_a), "   Unlabeled num: ", len(dataset_u), "Normal num: ", len(dataset_n))
 
         # dataset_anomaly, dataset_unlabeled, and dataset_temp are three dataset defined in the paper
         # dataset_test and test_label are used for test
@@ -82,7 +82,7 @@ class ad(gym.Env):
             self.check_num = self.check_num + 1
         elif self.previous_anomaly_num == len(self.dataset_anomaly):
             self.check_num = self.check_num - 1
-        print("check num: ", self.check_num)
+        # print("check num: ", self.check_num)
 
         return self.current_data
 

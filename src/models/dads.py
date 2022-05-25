@@ -11,7 +11,7 @@ class DADS(object):
         self.parameter = config
 
     def train(self, train_df, valid_df, black_len, white_len, finetune, former_episode):
-        print("\n", self.parameter)
+        # print("\n", self.parameter)
         if finetune:
             result_list = np.array([0]*self.parameter["hyperparameters"]["num_episodes_to_run"])
             for i in range(1):
@@ -21,17 +21,17 @@ class DADS(object):
                 temp = trainer.run_game_for_agent()
                 result_list = result_list + np.array([i[0] + i[1] for i in temp])
             best_episode = np.argmax(result_list) + 1
-            print("best_episode: ", best_episode)
-            self.parameter.num_episodes_to_run = best_episode
+            # print("best_episode: ", best_episode)
+            self.parameter["hyperparameters"]["num_episodes_to_run"] = best_episode
         else:
-            self.parameter.num_episodes_to_run = former_episode
+            self.parameter["hyperparameters"]["num_episodes_to_run"] = former_episode
 
         AGENT = SAC_Discrete
-        self.environment = ad(train_df, valid_df, black_len, white_len, self.parameter)
-        trainer = Trainer(self.parameter, AGENT, self.environment)
+        self.environment = ad(train_df, valid_df, black_len, white_len, self.parameter["environment"])
+        trainer = Trainer(self.parameter["hyperparameters"], AGENT, self.environment)
         trainer.run_game_for_agent()
 
-        return self.parameter.num_episodes_to_run
+        return self.parameter["hyperparameters"]["num_episodes_to_run"]
 
     def evaluate(self, test_df):
         auc_roc, auc_pr = self.environment.evaluate(test_df)

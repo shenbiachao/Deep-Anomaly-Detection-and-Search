@@ -48,7 +48,7 @@ class Base_Agent(object):
                                                                       auc_pr) + "\nanomaly: {} temp: {} unlabeled: {} normal: {}".format(
                 len(self.environment.dataset_anomaly), len(self.environment.dataset_temp),
                 len(self.environment.dataset_unlabeled), len(self.environment.dataset_normal))
-            print(res)
+            # print(res)
             result_list.append([auc_roc, auc_pr])
 
         return result_list

@@ -89,7 +89,7 @@ def baseline():
         if not former_config:
             finetune = True
         else:
-            for i in range(4):
+            for i in [0, 2, 3]:
                 if config[i] != former_config[i]:
                     finetune = True
         former_config = config
