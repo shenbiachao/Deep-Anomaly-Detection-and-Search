@@ -10,17 +10,17 @@ class Base_Agent(object):
     def __init__(self, config, environment):
         self.hyperparameters = config
         self.environment = environment
-        self.action_types = "DISCRETE"
-        self.action_size = int(self.environment.action_space.n)
-        # self.action_types = "CONTINUOUS"
-        # self.action_size = 1
+        # self.action_types = "DISCRETE"
+        # self.action_size = int(self.environment.action_space.n)
+        self.action_types = "CONTINUOUS"
+        self.action_size = 1
 
-        self.state_size = int(self.environment.reset().size()[0])
+        self.state_size = self.environment.current_data.size()[0]
         self.total_episode_score_so_far = 0
         self.episode_number = 0
         self.global_step_number = 0
         self.turn_off_exploration = False
-        gym.logger.set_level(40)  # stops it from printing an unnecessary warning
+        gym.logger.set_level(40)  # stops it from printing an unnecessary warningself.environment.re
 
     def step(self):
         """ Take a step in the game. This method must be overriden by any agent"""
@@ -29,6 +29,10 @@ class Base_Agent(object):
     def eval(self):
         """ Evaluate the agent itself in the game. This method must be overriden by any agent"""
         raise ValueError("Eval needs to be implemented by the agent")
+
+    def pretrain(self):
+        """ Evaluate the agent itself in the game. This method must be overriden by any agent"""
+        raise ValueError("Pretrain needs to be implemented by the agent")
 
     def reset_game(self):
         self.state = self.environment.reset()
@@ -43,13 +47,15 @@ class Base_Agent(object):
         while self.episode_number < self.hyperparameters["num_episodes_to_run"]:
             self.reset_game()
             self.step()  # here step functon will complete a single training episode
-            auc_roc, auc_pr = self.eval()
-            res = "Episode {}: auc_roc {:.03f} auc_pr {:.03f}".format(self.episode_number, auc_roc,
-                                                                      auc_pr) + "\nanomaly: {} temp: {} unlabeled: {} normal: {}".format(
-                len(self.environment.dataset_anomaly), len(self.environment.dataset_temp),
-                len(self.environment.dataset_unlabeled), len(self.environment.dataset_normal))
-            # print(res)
-            result_list.append([auc_roc, auc_pr])
+            (val_auc_roc, val_auc_pr), (test_auc_roc, test_auc_pr) = self.eval()
+            # res = "Episode {}: auc_roc {:.03f} auc_pr {:.03f}".format(self.episode_number, auc_roc,
+            #                                                           auc_pr) + "\nanomaly: {} temp: {} unlabeled: {} normal: {}".format(
+            #     len(self.environment.dataset_anomaly), len(self.environment.dataset_temp),
+            #     len(self.environment.dataset_unlabeled), len(self.environment.dataset_normal))
+            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f}, test_auc_roc {:.03f} test_auc_pr {:.03f}".format(self.episode_number, val_auc_roc,
+                                                                      val_auc_pr, test_auc_roc, test_auc_pr)
+            print(res)
+            result_list.append([test_auc_roc, test_auc_pr])
 
         return result_list
 

@@ -84,11 +84,10 @@ class Replay_Buffer(object):
 
 class OU_Noise(object):
     """Ornstein-Uhlenbeck process."""
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
+    def __init__(self, size, mu=0., theta=0.15, sigma=0.2):
         self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
-        self.seed = random.seed(seed)
         self.reset()
 
     def reset(self):
@@ -130,10 +129,8 @@ class RSAMPLE:
 
 class OU_Noise_Exploration():
     """Ornstein-Uhlenbeck noise process exploration strategy"""
-    def __init__(self, config):
-        self.config = config
-        self.noise = OU_Noise(self.config.action_size, self.config.seed, self.config.hyperparameters["mu"],
-                              self.config.hyperparameters["theta"], self.config.hyperparameters["sigma"])
+    def __init__(self, size, mu=0., theta=0.15, sigma=0.2):
+        self.noise = OU_Noise(size, mu, theta, sigma)
 
     def perturb_action_for_exploration_purposes(self, action_info):
         """Perturbs the action of the agent to encourage exploration"""

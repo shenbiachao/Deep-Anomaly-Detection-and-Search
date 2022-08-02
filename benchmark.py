@@ -23,12 +23,13 @@ from src.models.builder import BenchmarkBuilder
 from src.models.ssad import SSAD
 from src.datasets.semi_supervised_ad_loader import TabularData
 # from semi_supervised_ad_loader import TabularData
+import sys
 
 #------------------------------------------------------------------------------#
 #                                 PARAMETERS                                   #
 #------------------------------------------------------------------------------#
 
-MODEL_NAME = "dads"
+MODEL_NAME = str(sys.argv[1])
 
 CONFIG_LIST = glob.glob("./config/{}/*.toml".format(MODEL_NAME))
 CONFIG = toml.load(CONFIG_LIST)
@@ -146,7 +147,17 @@ def baseline():
             del model
 
         elif MODEL_NAME == 'dads':
-            former_episode = model.train(train_df, val_df, black_len, white_len, finetune, former_episode)
+            # former_episode = model.train(train_df, val_df, black_len, white_len, finetune, former_episode)
+            former_episode = model.train(train_df, test_df, val_df, black_len, white_len, finetune, former_episode)
+
+            ## Model Evaluation
+            roc_auc, roc_pr = model.evaluate(test_df)
+
+            results.append([dataset_name,seed,
+                anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
+
+        elif MODEL_NAME == 'dplan':
+            former_episode = model.train(train_df, val_df, black_len, white_len)
 
             ## Model Evaluation
             roc_auc, roc_pr = model.evaluate(test_df)

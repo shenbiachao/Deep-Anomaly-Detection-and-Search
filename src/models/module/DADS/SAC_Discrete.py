@@ -5,6 +5,9 @@ import numpy as np
 from .Base_Agent import Base_Agent
 from .Utility_Functions import Replay_Buffer
 from .Utility_Functions import create_actor_distribution
+from torch.utils.data import DataLoader
+from torch.utils.data import TensorDataset
+from pyod.models.iforest import IForest
 
 
 class SAC_Discrete(Base_Agent):
@@ -43,6 +46,33 @@ class SAC_Discrete(Base_Agent):
         self.log_alpha = torch.zeros(1, requires_grad=True, device=self.hyperparameters["device"])
         self.alpha = self.log_alpha.exp()
         self.alpha_optim = Adam([self.log_alpha], lr=self.hyperparameters["Actor"]["learning_rate"], eps=1e-4)
+
+        self.environment.net = self.actor_local
+
+    def pretrain(self):
+        clf = IForest()
+        if len(self.environment.dataset_unlabeled) > 5000:
+            candidate_index = np.random.choice([i for i in range(len(self.environment.dataset_unlabeled))], size=5000,
+                                               replace=False)
+            candidate = self.environment.dataset_unlabeled[candidate_index]
+        else:
+            candidate = self.environment.dataset_unlabeled
+        clf.fit(candidate.cpu())
+        y = torch.tensor([[i] for i in np.array(clf.predict_proba(self.environment.dataset_unlabeled.cpu()))[:, 1]])
+
+        dataset = TensorDataset(self.environment.dataset_unlabeled, y)
+        loader = DataLoader(dataset, batch_size=64, shuffle=True)
+
+        optimizer = Adam(self.actor_local.parameters())
+        loss = torch.nn.MSELoss()
+        for _, (data, score) in enumerate(loader):
+            score_hat = self.actor_local(data)[:, 1]
+            score = score.squeeze()
+            l = loss(score.cpu(), score_hat.cpu())
+            optimizer.zero_grad()
+            l.backward()
+            optimizer.step()
+
 
     def produce_action_and_action_info(self, state):
         """

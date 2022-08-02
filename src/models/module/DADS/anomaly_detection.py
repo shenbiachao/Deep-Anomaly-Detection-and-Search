@@ -14,7 +14,7 @@ device = 'cuda'
 
 
 class ad(gym.Env):
-    def __init__(self, train_df, valid_df, black_len, white_len, parameter):
+    def __init__(self, train_df, valid_df, test_df, black_len, white_len, parameter):
         dataset_a = torch.tensor(train_df.iloc[:black_len, :-1].values.astype(float)).float().to(device)
         dataset_n = torch.tensor(
             train_df.iloc[black_len:black_len + white_len, :-1].values.astype(float)).float().to(device)
@@ -32,6 +32,7 @@ class ad(gym.Env):
         self.dataset_unlabeled_backup = dataset_u
         self.dataset_temp = torch.tensor([]).to(device)
         self.valid_df = valid_df
+        self.test_df = test_df
         self.tempdata_confidence = []
 
         # initialize current data to be an unlabeled data
@@ -53,6 +54,8 @@ class ad(gym.Env):
         self.previous_anomaly_num = len(self.dataset_anomaly)
 
         self.net = None
+        self.tot_reward = 0
+        self.score_threshold = parameter["score_threshold"]
 
         # choose the following six methods as unsupervised anomaly datection method
         self.clf_list = [IForest(), HBOS(), OCSVM(), RSAMPLE()]
@@ -73,15 +76,17 @@ class ad(gym.Env):
             candidate = self.dataset_unlabeled[candidate_index]
         else:
             candidate = self.dataset_unlabeled
+        candidate = self.net.process_hidden_layers(candidate).detach().cpu().numpy()
         for i in range(len(self.clf_list)):
             if self.sampling_method_distribution[i] > 0:
                 clf = self.clf_list[i]
-                clf.fit(candidate.cpu())
+                clf.fit(candidate)
 
-        if self.previous_anomaly_num > 1.5 * len(self.dataset_anomaly):
-            self.check_num = self.check_num + 1
-        elif self.previous_anomaly_num == len(self.dataset_anomaly):
-            self.check_num = self.check_num - 1
+
+        # if self.previous_anomaly_num > 1.5 * len(self.dataset_anomaly):
+        #     self.check_num = self.check_num + 1
+        # elif self.previous_anomaly_num == len(self.dataset_anomaly):
+        #     self.check_num = self.check_num - 1
         # print("check num: ", self.check_num)
 
         return self.current_data
@@ -92,22 +97,25 @@ class ad(gym.Env):
         @param type_index: the index of unsupervised detecto, if type_index>=len(self.clf_list), random sampling method will be applied
         @param data: data needs to be calculated, both single data or multiple data is acceptable
         """
+        mapped_data = self.net.process_hidden_layers(data).detach().cpu().numpy()
         clf = self.clf_list[type_index]
         if len(data.shape) == 1:
-            r = clf.predict_proba(data.cpu().unsqueeze(0))[0][1]
+            r = clf.predict_proba(mapped_data.reshape(1, -1))[0][1]
         else:
-            r = np.array(clf.predict_proba(data.cpu()))[:, 1]
+            r = np.array(clf.predict_proba(mapped_data))[:, 1]
         data.to(device)
 
         return r
 
     def calculate_reward(self, action):
         """ calculate reward based on the class of current data and the action"""
+        choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
+                                  p=self.sampling_method_distribution)[0]
         if self.current_class == 'anomaly':
             if action == 1:
-                score = self.reward_list[0]
+                score = self.reward_list[0] * self.unsupervised_index(choice, self.current_data)
             else:
-                score = self.reward_list[1]
+                score = self.reward_list[1] * self.unsupervised_index(choice, self.current_data)
         elif self.current_class == 'normal':
             if action == 0:
                 score = self.reward_list[2]
@@ -120,7 +128,7 @@ class ad(gym.Env):
                 score = 0
         elif self.current_class == 'temp':
             if action == 1 and self.tempdata_confidence[self.current_index] >= self.check_num:
-                score = self.reward_list[5]
+                score = self.reward_list[5] * self.unsupervised_index(choice, self.current_data)
             else:
                 score = 0
         else:
@@ -185,9 +193,16 @@ class ad(gym.Env):
             self.tempdata_confidence = self.tempdata_confidence[:self.current_index] + \
                                        self.tempdata_confidence[self.current_index + 1:]
 
-    def step(self, action):
+    def step(self, s):
         """ Environment takes an action, then returns the current data(regarded as state), reward and done flag"""
+        if s > self.score_threshold:
+            action = 1
+        else:
+            action = 0
+
         reward = self.calculate_reward(action)
+        # reward = reward - 0.1 * (s[0] - self.unsupervised_index(0, self.current_data))**2
+        self.tot_reward = self.tot_reward + reward
 
         self.dataset_unlabeled.to(device)
         self.tot_steps = self.tot_steps + 1
@@ -196,6 +211,8 @@ class ad(gym.Env):
         done = False
         if self.tot_steps % self.max_trajectory == 0:
             done = True
+            print("Total reward: ", self.tot_reward)
+            self.tot_reward = 0
             self.previous_anomaly_num = len(self.dataset_anomaly)
 
         while True:   # sample next data according to the probablity distribution
@@ -219,10 +236,11 @@ class ad(gym.Env):
         x = torch.tensor(df.iloc[:, :-1].values.astype(float)).float().to(device)
         y = list(df.iloc[:, -1].values.astype(float))
 
-        # q_values = self.net(x)
-        # anomaly_score = q_values[:, 0]
         q_values = self.net(x)
-        anomaly_score = q_values[:, 1]
+        anomaly_score = q_values[:, 0]
+        # q_values = self.net(x)
+        # anomaly_score = q_values[:, 1]
+
         auc_roc = roc_auc_score(y, anomaly_score.cpu().detach())
         precision, recall, _thresholds = precision_recall_curve(y, anomaly_score.cpu().detach())
         auc_pr = auc(recall, precision)

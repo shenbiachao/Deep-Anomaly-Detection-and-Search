@@ -98,7 +98,7 @@ class DevNet(object):
         self.model = model
 
         print(self.model.summary())  
-        model_name = "./model/devnet_model.h5" 
+        model_name = "./save_model/devnet_model.h5"
         self.model_name = model_name
         checkpointer = ModelCheckpoint(model_name, monitor='loss', verbose=0,
                                         save_best_only = True, save_weights_only = True)            

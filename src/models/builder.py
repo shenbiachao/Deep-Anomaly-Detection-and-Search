@@ -27,7 +27,7 @@ from .unsupervised import UnsupervisedModel
 # from .devnet import DevNet
 # from .vime import VIME
 from .dads import DADS
-
+from .dplan import dplan
 #------------------------------------------------------------------------------#
 #                                 Config                                    #
 #------------------------------------------------------------------------------#
@@ -63,7 +63,7 @@ class BenchmarkBuilder(object):
             model = SSAD(config)
         elif model_name == "supervised":
             seed = kwargs.get('seed')
-            model  = XGB(config, seed=seed)
+            model = XGB(config, seed=seed)
         elif model_name == 'deepSAD':
             seed = kwargs.get('seed')
             dataset_name = kwargs.get('dataset_name')
@@ -75,13 +75,15 @@ class BenchmarkBuilder(object):
         elif model_name == 'unsupervised':
             seed = kwargs.get('seed')
             model = UnsupervisedModel(config,seed=seed)
-        elif model_name == 'devnet':
-            seed = kwargs.get('seed')
-            model = DevNet(config,seed=seed)
+        # elif model_name == 'devnet':
+        #     seed = kwargs.get('seed')
+        #     model = DevNet(config,seed=seed)
 
-        elif model_name == 'vime':
-            model = VIME(config)
+        # elif model_name == 'vime':
+        #     model = VIME(config)
         elif model_name == "dads":
             model = DADS(config)
+        elif model_name == "dplan":
+            model = dplan(config)
 
         return model
