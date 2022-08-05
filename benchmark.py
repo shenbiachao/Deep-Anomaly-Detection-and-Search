@@ -104,7 +104,7 @@ def baseline():
             all_normal_classes = CONFIG['MULTI_CLASS_AD_SETTING']['NORMAL_CLASSES'][dataset_name]
             known_anomaly_class = CONFIG['MULTI_CLASS_AD_SETTING']['KNOWN_ANOMALY_CLASS'][dataset_name]
 
-            train_df, val_df, test_df, black_len, white_len = TabularData.semi_supervised_multi_class_ad_sampling(
+            train_df, val_df, test_df, black_len, white_len, ori_df = TabularData.semi_supervised_multi_class_ad_sampling(
                 df, seed = seed, anomalies_fraction = anomalies_fraction
                 , normalies_ratio = normalies_ratio
                 , comtaination_ratio = comtaination_ratio
@@ -113,7 +113,7 @@ def baseline():
                 )
 
         else:
-            train_df, val_df, test_df, black_len, white_len = TabularData.semi_supervised_ad_sampling(
+            train_df, val_df, test_df, black_len, white_len, ori_df= TabularData.semi_supervised_ad_sampling(
                 df, seed = seed, anomalies_fraction = anomalies_fraction
                 , normalies_ratio = normalies_ratio
                 , comtaination_ratio = comtaination_ratio
@@ -148,10 +148,11 @@ def baseline():
 
         elif MODEL_NAME == 'dads':
             # former_episode = model.train(train_df, val_df, black_len, white_len, finetune, former_episode)
-            former_episode = model.train(train_df, test_df, val_df, black_len, white_len, finetune, former_episode)
+            former_episode = model.train(train_df, val_df, test_df, black_len, white_len, finetune, former_episode, ori_df, dataset_name)
 
             ## Model Evaluation
             roc_auc, roc_pr = model.evaluate(test_df)
+            print("test roc: {}, test pr: {}".format(roc_auc, roc_pr))
 
             results.append([dataset_name,seed,
                 anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
@@ -173,10 +174,17 @@ def baseline():
                 )
 
             ## Model Evaluation
-            roc_auc, roc_pr = model.evaluate(test_df)
+            roc_auc, roc_pr = model.evaluate(test_df, True)
 
             results.append([dataset_name,seed,
                 anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
+
+        ## Save results
+        results_df = pd.DataFrame(results)
+        results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
+                                'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr']
+
+        results_df.to_csv("./results/1{}_{}.csv".format(MODEL_NAME, dataset_name), index=False)
 
     ## Save results
     results_df = pd.DataFrame(results)

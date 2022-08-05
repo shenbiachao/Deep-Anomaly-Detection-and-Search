@@ -8,21 +8,21 @@ device = 'cuda'
 sample_num = 50  # number data sampled when sampling dataset_unlabeled,
 # then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
 max_trajectory = 5000  # number of steps per each episode
-check_num = 5  # threshold of confidence
-reward_list = [1.0, -1.0, 0.5, -0.5, 0.0, 10.0]  # rewards used in calculating reward
+check_num = 100  # threshold of confidence
+reward_list = [1.0, -1.0, 0.5, -0.5, 0.0, 1.0]  # rewards used in calculating reward
 strategy_distribution = [0.2, 0.1, 0.2, 0.5]  # probability distribution used to choose sampling strategy
-sampling_method_distribution = [0.1, 0.1, 0.3, 0.5]  # probability distribution used to choose unsupervised method
-score_threshold=0.5
+sampling_method_distribution = [0.2, 0.0, 0.3, 0.5]  # probability distribution used to choose unsupervised method
+score_threshold = 0.9
 
 [hyperparameters]
 min_steps_before_learning=10000
 batch_size=64
 update_every_n_steps=32
-learning_updates_per_learning_session=16
+learning_updates_per_learning_session=32
 add_extra_noise=true
 discount_rate=0.99
-num_episodes_to_run=5   # episodes per training
-device='cuda'
+num_episodes_to_run=10   # episodes per training
+device="cuda"
 
 automatically_tune_entropy_hyperparameter=true
 entropy_term_weight="None"
@@ -38,6 +38,7 @@ batch_norm=false
 tau=0.2
 gradient_clipping_norm=5
 initialiser="Xavier"
+pretrain=0
 
 [hyperparameters.Critic]
 learning_rate=0.0005
@@ -48,7 +49,6 @@ buffer_size=100000
 tau=0.2
 gradient_clipping_norm=5
 initialiser="Xavier"
-pretrain=1
 
 [INFERENCE]
 MODEL_DIR = "/models/dummy.p"

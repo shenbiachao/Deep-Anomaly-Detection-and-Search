@@ -297,7 +297,7 @@ class TabularData(PytorchDataset):
         val_df.reset_index(inplace=True, drop=True)
         test_df.reset_index(inplace=True, drop=True)
 
-        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio)
+        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio), train_df
 
     @classmethod
     def concat_dataset(cls, dataset1, dataset2):
@@ -459,7 +459,7 @@ class TabularData(PytorchDataset):
         val_df['label'] = val_df['label'].apply(lambda x: 0 if x ==0 else 1)
         test_df['label'] = test_df['label'].apply(lambda x: 0 if x ==0 else 1)
 
-        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio)
+        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio), train_df
 
 def test():
     """

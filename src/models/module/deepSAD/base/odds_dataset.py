@@ -3,7 +3,7 @@ from torch.utils.data import Dataset
 from scipy.io import loadmat
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from torchvision.datasets.utils import download_url
+# from torchvision.datasets.utils import download_url
 
 import os
 import torch
@@ -107,6 +107,6 @@ class ODDSDataset(Dataset):
             return
 
         # download file
-        download_url(self.urls[self.dataset_name], self.root, self.file_name)
+        # download_url(self.urls[self.dataset_name], self.root, self.file_name)
 
         print('Done!')

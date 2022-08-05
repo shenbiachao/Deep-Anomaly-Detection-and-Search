@@ -2,7 +2,7 @@ import numpy as np
 import os
 from datetime import datetime
 import json
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 import torch
 import random
 
@@ -41,7 +41,7 @@ class Logger():
         self.log_path = log_path
         if not os.path.exists(log_path):
             os.makedirs(log_path)
-        self.tb_writer = SummaryWriter(log_path)
+        # self.tb_writer = SummaryWriter(log_path)
         self.log_file_path = os.path.join(log_path, "output.txt")
         self.print_to_terminal = print_to_terminal
         self.warning_level = warning_level

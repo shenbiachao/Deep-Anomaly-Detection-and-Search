@@ -233,7 +233,7 @@ class DQNTrainer:
         return np.mean(rewards)
 
     def evaluate(self, df):
-        x = torch.tensor(df.iloc[:, :-1].values.astype(float)).float().cuda()
+        x = torch.tensor(df.iloc[:, :-1].values.astype(float)).float()
         y = list(df.iloc[:, -1].values.astype(float))
 
         q_values = self.agent.q_network(x)

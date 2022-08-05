@@ -213,4 +213,4 @@ class SAC(Base_Agent):
 
     def eval(self):
         """ Evaluate the actor"""
-        return self.environment.evaluate(self.environment.valid_df), self.environment.evaluate(self.environment.test_df)
+        return self.environment.evaluate(self.environment.valid_df, False), self.environment.evaluate(self.environment.test_df, False)

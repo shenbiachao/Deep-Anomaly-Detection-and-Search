@@ -1,9 +1,9 @@
 import pandas as pd
-from src.models.module.DADS.anomaly_detection import ad
-from src.models.module.DADS.SAC_Discrete import SAC_Discrete
-from src.models.module.DADS.SAC import SAC
-from src.models.module.DADS.DDPG import DDPG
-from src.models.module.DADS.Trainer import Trainer
+from src.models.module.dads.anomaly_detection import ad
+from src.models.module.dads.SAC_Discrete import SAC_Discrete
+from src.models.module.dads.SAC import SAC
+from src.models.module.dads.DDPG import DDPG
+from src.models.module.dads.Trainer import Trainer
 import numpy as np
 
 
@@ -12,7 +12,7 @@ class DADS(object):
         """Init DADS instance."""
         self.parameter = config
 
-    def train(self, train_df, valid_df, test_df, black_len, white_len, finetune, former_episode):
+    def train(self, train_df, valid_df, test_df, black_len, white_len, finetune, former_episode, ori_df, dataset_name):
         # print("\n", self.parameter)
         # if finetune:
         #     result_list = np.array([0]*self.parameter["hyperparameters"]["num_episodes_to_run"])
@@ -31,14 +31,14 @@ class DADS(object):
 
         # AGENT = SAC_Discrete
         AGENT = SAC
-        self.environment = ad(train_df, valid_df, test_df, black_len, white_len, self.parameter["environment"])
+        self.environment = ad(train_df, valid_df, test_df, black_len, white_len, self.parameter["environment"], ori_df, dataset_name)
         trainer = Trainer(self.parameter["hyperparameters"], AGENT, self.environment)
         trainer.run_game_for_agent()
 
         return self.parameter["hyperparameters"]["num_episodes_to_run"]
 
     def evaluate(self, test_df):
-        auc_roc, auc_pr = self.environment.evaluate(test_df)
+        auc_roc, auc_pr = self.environment.evaluate(test_df, True)
 
         return auc_roc, auc_pr
 
