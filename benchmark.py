@@ -183,6 +183,9 @@ def baseline():
         results_df = pd.DataFrame(results)
         results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
                                 'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr']
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print(current_time)
 
         results_df.to_csv("./results/1{}_{}.csv".format(MODEL_NAME, dataset_name), index=False)
 
@@ -196,7 +199,7 @@ def baseline():
     results_df.to_csv(
         # "./results/{}/{}_setting21_result.csv".format(MODEL_NAME,current_time), index=False)
         # "./results/{}/{}_setting22_multi_shuttle_rerun_result.csv".format(MODEL_NAME,current_time), index=False)
-        "./results/{}/{}_setting11_result_result.csv".format(MODEL_NAME, current_time), index=False)
+        "./results/{}_{}_setting21_result_result.csv".format(MODEL_NAME, current_time), index=False)
 
     pass
 

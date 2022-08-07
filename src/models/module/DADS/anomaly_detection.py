@@ -91,11 +91,11 @@ class ad(gym.Env):
                 clf.fit(candidate)
 
 
-        # if self.previous_anomaly_num > 1.5 * len(self.dataset_anomaly):
-        #     self.check_num = self.check_num + 1
-        # elif self.previous_anomaly_num == len(self.dataset_anomaly):
-        #     self.check_num = self.check_num - 1
-        # print("check num: ", self.check_num)
+        if self.previous_anomaly_num > 1.5 * len(self.dataset_anomaly):
+            self.check_num = self.check_num + 1
+        elif self.previous_anomaly_num == len(self.dataset_anomaly):
+            self.check_num = self.check_num - 1
+        print("check num: ", self.check_num)
 
         return self.current_data
 
@@ -117,8 +117,8 @@ class ad(gym.Env):
 
     def calculate_reward(self, action):
         """ calculate reward based on the class of current data and the action"""
-        # choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
-        #                           p=self.sampling_method_distribution)[0]
+        choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
+                                  p=self.sampling_method_distribution)[0]
         if self.current_class == 'anomaly':
             if action == 1:
                 score = self.reward_list[0] * self.unsupervised_index(0, self.current_data)
@@ -130,19 +130,23 @@ class ad(gym.Env):
             else:
                 score = self.reward_list[3]
         elif self.current_class == 'unlabeled':
-            # if action == 0:
-            #     score = self.reward_list[4] + self.unsupervised_index(0, self.current_data)
-            # else:
-            #     score = self.unsupervised_index(0, self.current_data)
             if action == 0:
-                score = self.reward_list[4]
+                score = self.unsupervised_index(0, self.current_data)
             else:
-                score = 0
+                score = self.unsupervised_index(0, self.current_data)
+            # if action == 0:
+            #     score = self.reward_list[4]
+            # else:
+            #     score = 0
         elif self.current_class == 'temp':
             if action == 1 and self.tempdata_confidence[self.current_index] >= self.check_num:
                 score = self.reward_list[5] * self.unsupervised_index(0, self.current_data)
             else:
                 score = 0
+            # if action == 1 and self.tempdata_confidence[self.current_index] >= self.check_num:
+            #     score = self.reward_list[5] * self.unsupervised_index(0, self.current_data)
+            # else:
+            #     score = self.unsupervised_index(0, self.current_data)
         else:
             assert 0
 
@@ -257,7 +261,6 @@ class ad(gym.Env):
             action = 0
 
         reward = self.calculate_reward(action)
-        # reward = reward - 0.1 * (s[0] - self.unsupervised_index(0, self.current_data))**2
         self.tot_reward = self.tot_reward + reward
 
         self.dataset_unlabeled.to(self.device)
@@ -275,16 +278,15 @@ class ad(gym.Env):
             if roc > self.best_roc:
                 self.best_net = copy.deepcopy(self.net)
                 self.best_roc = roc
-            self.best_roc = 0
 
-            false_count = 0
-            for j in self.dataset_anomaly:
-                temp = self.x_original - np.array(j.cpu())
-                temp = np.sum(temp**2, axis=1)
-                if self.y_original[np.where(temp<1e-6)] == 0:
-                    false_count = false_count + 1
-
-            print("Anomaly num: {} --> {}/{}".format(len(self.dataset_anomaly_backup), len(self.dataset_anomaly) - false_count, len(self.dataset_anomaly)))
+            # false_count = 0
+            # for j in self.dataset_anomaly:
+            #     temp = self.x_original - np.array(j.cpu())
+            #     temp = np.sum(temp**2, axis=1)
+            #     if self.y_original[np.where(temp<1e-6)] == 0:
+            #         false_count = false_count + 1
+            #
+            # print("Anomaly num: {} --> {}/{}".format(len(self.dataset_anomaly_backup), len(self.dataset_anomaly) - false_count, len(self.dataset_anomaly)))
 
         while True:   # sample next data according to the probablity distribution
             choice = np.random.choice([0, 1, 2, 3], size=1, p=self.strategy_distribution)[0]

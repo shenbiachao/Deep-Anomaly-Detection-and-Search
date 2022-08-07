@@ -5,13 +5,13 @@
 # Setting 1.1
 [DATA]
 # DATASETS = ['annthyroid','cardio','satimage2','satellite','thyroid']
-DATASETS = ['annthyroid']
+DATASETS = ['annthyroid','cardio','satimage2','satellite','thyroid']
 # SEEDS = [1,20,42,50,99,101,135,145,165,200]
-SEEDS = [145,165,200]
+SEEDS = [135]
 
 [SEMI_SUPERVISED_SETTING]
 ANOMALIES_FRACTION = [0.1]
-COMTAINATION_RATIO = [0.0, 0.02, 0.04, 0.06, 0.08, 0.1]
+COMTAINATION_RATIO = [0.06, 0.08, 0.1]
 NORMALIES_RATIO = [0]
 
 
