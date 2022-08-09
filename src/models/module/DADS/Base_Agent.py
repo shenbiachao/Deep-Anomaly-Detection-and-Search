@@ -103,7 +103,7 @@ class Base_Agent(object):
                   batch_norm=hyperparameters["batch_norm"], dropout=hyperparameters["dropout"],
                   hidden_activations=hyperparameters["hidden_activations"], initialiser=hyperparameters["initialiser"],
                   columns_of_data_to_be_embedded=hyperparameters["columns_of_data_to_be_embedded"],
-                  embedding_dimensions=hyperparameters["embedding_dimensions"], y_range=hyperparameters["y_range"]).cuda()
+                  embedding_dimensions=hyperparameters["embedding_dimensions"], y_range=hyperparameters["y_range"]).to(self.environment.device)
 
     @staticmethod
     def copy_model_over(from_model, to_model):

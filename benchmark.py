@@ -187,7 +187,7 @@ def baseline():
         current_time = now.strftime("%H:%M:%S")
         print(current_time)
 
-        results_df.to_csv("./results/1{}_{}.csv".format(MODEL_NAME, dataset_name), index=False)
+        results_df.to_csv("./results/{}_{}.csv".format(MODEL_NAME, dataset_name), index=False)
 
     ## Save results
     results_df = pd.DataFrame(results)
