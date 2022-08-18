@@ -3,18 +3,18 @@
 # Here you can define training and inference configuration for training and inference pipeline.
 
 # Example:
-[environment]
-device = 'cuda'
+[Environment]
+device = "cuda"
 sample_num = 50  # number data sampled when sampling dataset_unlabeled,
 # then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
 max_trajectory = 5000  # number of steps per each episode
 check_num = 8  # threshold of confidence
 reward_list = [1.0, -1.0, 0.5, -0.5, 0.0, 1.0]  # rewards used in calculating reward
-strategy_distribution = [0.2, 0.0, 0.2, 0.6]  # probability distribution used to choose sampling strategy
+strategy_distribution = [0.2, 0.2, 0.6]  # probability distribution used to choose sampling strategy
 sampling_method_distribution = [0.17, 0.17, 0.16, 0.5]  # probability distribution used to choose unsupervised method
 score_threshold = 0.1
 
-[hyperparameters]
+[Agent]
 min_steps_before_learning=10000
 batch_size=64
 update_every_n_steps=16
@@ -30,7 +30,7 @@ mu=0.0
 theta=0.1
 sigma=0.2
 
-[hyperparameters.Actor]
+[Agent.Actor]
 learning_rate=0.0005
 linear_hidden_units=[32, 16]
 final_layer_activation="Sigmoid"
@@ -38,9 +38,8 @@ batch_norm=false
 tau=0.2
 gradient_clipping_norm=5
 initialiser="Xavier"
-pretrain=0
 
-[hyperparameters.Critic]
+[Agent.Critic]
 learning_rate=0.0005
 linear_hidden_units=[32, 16]
 final_layer_activation="None"

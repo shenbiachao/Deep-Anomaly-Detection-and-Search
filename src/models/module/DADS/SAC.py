@@ -59,31 +59,6 @@ class SAC(Base_Agent):
 
         self.environment.net = self.actor_local
 
-    def pretrain(self):
-        clf = IForest()
-        if len(self.environment.dataset_unlabeled) > 5000:
-            candidate_index = np.random.choice([i for i in range(len(self.environment.dataset_unlabeled))], size=5000,
-                                               replace=False)
-            candidate = self.environment.dataset_unlabeled[candidate_index]
-        else:
-            candidate = self.environment.dataset_unlabeled
-        clf.fit(candidate.cpu())
-        y = torch.tensor([[i] for i in np.array(clf.predict_proba(self.environment.dataset_unlabeled.cpu()))[:, 1]])
-        thre = np.percentile(y, 96)
-        y = torch.tensor([[0.0] if i < thre else [1.0] for i in y])
-
-        dataset = TensorDataset(self.environment.dataset_unlabeled, y)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-        loss = torch.nn.BCELoss()
-        for _, (data, score) in enumerate(loader):
-            score_hat = self.actor_local(data)[:, 0]
-            score = score.squeeze()
-            l = loss(score_hat.cpu(), score)
-            self.actor_optimizer.zero_grad()
-            l.backward()
-            self.actor_optimizer.step()
-
     def reset_game(self):
         """Resets the game information so we are ready to play a new episode"""
         Base_Agent.reset_game(self)
@@ -213,4 +188,4 @@ class SAC(Base_Agent):
 
     def eval(self):
         """ Evaluate the actor"""
-        return self.environment.evaluate(self.environment.valid_df, False), self.environment.evaluate(self.environment.test_df, False)
+        return self.environment.evaluate(self.environment.valid_df, False)

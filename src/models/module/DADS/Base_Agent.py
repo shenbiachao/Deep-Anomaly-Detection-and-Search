@@ -43,21 +43,17 @@ class Base_Agent(object):
 
     def run_n_episodes(self):
         """ Run game to completion train_round times and then summarises results"""
-        result_list = []
         while self.episode_number < self.hyperparameters["num_episodes_to_run"]:
             self.reset_game()
             self.step()  # here step functon will complete a single training episode
-            (val_auc_roc, val_auc_pr), (test_auc_roc, test_auc_pr) = self.eval()
+            val_auc_roc, val_auc_pr = self.eval()
             # res = "Episode {}: auc_roc {:.03f} auc_pr {:.03f}".format(self.episode_number, auc_roc,
             #                                                           auc_pr) + "\nanomaly: {} temp: {} unlabeled: {} normal: {}".format(
             #     len(self.environment.dataset_anomaly), len(self.environment.dataset_temp),
             #     len(self.environment.dataset_unlabeled), len(self.environment.dataset_normal))
-            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f}, test_auc_roc {:.03f} test_auc_pr {:.03f}".format(self.episode_number, val_auc_roc,
-                                                                      val_auc_pr, test_auc_roc, test_auc_pr)
+            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f}".format(self.episode_number, val_auc_roc,
+                                                                      val_auc_pr)
             print(res)
-            result_list.append([test_auc_roc, test_auc_pr])
-
-        return result_list
 
     def conduct_action(self, action):
         self.next_state, self.reward, self.done, _ = self.environment.step(action)

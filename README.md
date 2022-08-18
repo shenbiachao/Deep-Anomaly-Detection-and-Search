@@ -8,15 +8,25 @@ pip install requirements.txt
 ### Run
 To run default experiment 1.1 on DADS
 ``` shell
-python benchmark.py dads
+python3 benchmark.py dads 1-1
 ```
-
-To change semi-supervised algorithm, please choose a certain "**algo**" in "**dads**", "**ssad**", "**deepSAD**", "**supervised**", "**unsupervised**", "**vime**", "**devnet**", and execute
+or
 ``` shell
-python benchmark.py algo
+./run.sh
 ```
 
-To change experiment configuration of a certain algorithm "**algo**", please switch to directory **/config/algo/data_config.toml**.
-Experiment parameters of setting1.1, setting1.2 and setting2 are respectively annotated. Uncomment the chosen setting and annotate others.
+To specify algorithm and dataset setting, please:
+
+choose a certain "**algo**" in 
+"**dads**", "**ssad**", "**deepSAD**", "**supervised**", "**unsupervised**", "**vime**", "**devnet**", "**dplan**", 
+"**static_stoc**", "**dynamic_stoc**";
+
+choose a certain "**setting**" in "**1-1**", "**1-2**", "**2-1**", "**2-1**".
+
+Then execute: 
+``` shell
+python benchmark.py algo setting
+```
+
 
 To change model configuration of a certain algorithm "**algo**", please switch to directory **/config/algo/model_config.toml**.

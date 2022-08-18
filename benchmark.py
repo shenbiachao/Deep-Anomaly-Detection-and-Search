@@ -7,6 +7,32 @@ Apr 30: Semi-supervised anomaly detection experiment
 """
 
 #------------------------------------------------------------------------------#
+#                                 LOGGER                                   #
+#------------------------------------------------------------------------------#
+
+import os
+import yaml
+import logging
+import logging.config
+from os import path as os_path
+
+
+def setup_log_config(log_path, log_file_name, log_config_file):
+    """Set up logger configuration"""
+
+    os.makedirs(log_path, exist_ok=True)
+    with open(log_config_file, 'r') as f:
+        log_cfg = yaml.safe_load(f.read())
+    log_cfg['handlers']['file_handler']['filename'] = os_path.join(
+        log_path, log_file_name)
+    logging.config.dictConfig(log_cfg)
+
+logger = setup_log_config('./logs/', 'main.log', './log_config.yaml')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
+#------------------------------------------------------------------------------#
 #                                 MODULE                                   #
 #------------------------------------------------------------------------------#
 
@@ -20,16 +46,14 @@ from tqdm import tqdm
 
 
 from src.models.builder import BenchmarkBuilder
-from src.models.ssad import SSAD
 from src.datasets.semi_supervised_ad_loader import TabularData
-# from semi_supervised_ad_loader import TabularData
-import sys
 
 #------------------------------------------------------------------------------#
 #                                 PARAMETERS                                   #
 #------------------------------------------------------------------------------#
 
 MODEL_NAME = str(sys.argv[1])
+setting = str(sys.argv[2])
 
 CONFIG_LIST = glob.glob("./config/{}/*.toml".format(MODEL_NAME))
 CONFIG = toml.load(CONFIG_LIST)
@@ -40,16 +64,16 @@ CONFIG = toml.load(CONFIG_LIST)
 ## 10% of TOTAL black train data are labeled
 ## If number of black samples in training dataset is 50, 0.1 means 5 labeled black dataset is available in training set
 ## the rest of the black dataset(45 out of 50) will be discarded（unless COMTAINATION_RATIO>0）.
-ANOMALIES_FRACTION = CONFIG['SEMI_SUPERVISED_SETTING']['ANOMALIES_FRACTION']
+ANOMALIES_FRACTION = CONFIG[setting]['SEMI_SUPERVISED_SETTING']['ANOMALIES_FRACTION']
 
 ## Labeled normalies to labeled anomalies ratio: 
 ## Say 5 out of 50 labeled black samples in the training set, NORMALIES_RATIO=5 means 25 labeled normal samples will be in the dataset
 ## NORMALIES_RATIO=0 means no labeled normal samples in the training dataset.
-NORMALIES_RATIO = CONFIG['SEMI_SUPERVISED_SETTING']['NORMALIES_RATIO']
+NORMALIES_RATIO = CONFIG[setting]['SEMI_SUPERVISED_SETTING']['NORMALIES_RATIO']
 
 ## Proportion of unlabeled black sampleds in the unlabeled training dataset
 ## If unlabeled training size = 100, COMTAINATION_RATIO=0.01 means 1 out of 100 is black sample.
-COMTAINATION_RATIO = CONFIG['SEMI_SUPERVISED_SETTING']['COMTAINATION_RATIO']
+COMTAINATION_RATIO = CONFIG[setting]['SEMI_SUPERVISED_SETTING']['COMTAINATION_RATIO']
 
 
 
@@ -69,8 +93,8 @@ def baseline():
     import itertools
 
     ## Create experiments setting
-    benchmark_datasets = CONFIG['DATA']['DATASETS']
-    seeds = CONFIG['DATA']['SEEDS']
+    benchmark_datasets = CONFIG[setting]['DATA']['DATASETS']
+    seeds = CONFIG[setting]['DATA']['SEEDS']
 
     configs = list(itertools.product(
         benchmark_datasets,seeds, ANOMALIES_FRACTION,
@@ -78,22 +102,14 @@ def baseline():
 
     
     results = []
-    former_config = None
-    former_episode = None
 
     for config in tqdm(configs):
 
         ## Unpack hyperparameters
         dataset_name, seed, anomalies_fraction, normalies_ratio, comtaination_ratio = config
 
-        finetune = False
-        if not former_config:
-            finetune = True
-        else:
-            for i in [0, 2, 3]:
-                if config[i] != former_config[i]:
-                    finetune = True
-        former_config = config
+        logger.info("Current dataset is {}".format(dataset_name))
+        logger.info("current setting is {}".format(setting))
 
         ## Load data
         ad_ds = TabularData.load(dataset_name)
@@ -101,8 +117,8 @@ def baseline():
 
         ## Semi-supervised setting
         if 'multi' in dataset_name:
-            all_normal_classes = CONFIG['MULTI_CLASS_AD_SETTING']['NORMAL_CLASSES'][dataset_name]
-            known_anomaly_class = CONFIG['MULTI_CLASS_AD_SETTING']['KNOWN_ANOMALY_CLASS'][dataset_name]
+            all_normal_classes = CONFIG[setting]['MULTI_CLASS_AD_SETTING']['NORMAL_CLASSES'][dataset_name]
+            known_anomaly_class = CONFIG[setting]['MULTI_CLASS_AD_SETTING']['KNOWN_ANOMALY_CLASS'][dataset_name]
 
             train_df, val_df, test_df, black_len, white_len, ori_df = TabularData.semi_supervised_multi_class_ad_sampling(
                 df, seed = seed, anomalies_fraction = anomalies_fraction
@@ -121,7 +137,6 @@ def baseline():
 
         ## Build model
         model = BenchmarkBuilder.build(MODEL_NAME, CONFIG, seed=seed, dataset_name = dataset_name)
-        # model = SSAD(CONFIG)
 
         ## Model training
         if MODEL_NAME == 'deepSAD':
@@ -147,8 +162,7 @@ def baseline():
             del model
 
         elif MODEL_NAME == 'dads':
-            # former_episode = model.train(train_df, val_df, black_len, white_len, finetune, former_episode)
-            former_episode = model.train(train_df, val_df, test_df, black_len, white_len, finetune, former_episode, ori_df, dataset_name)
+            model.train(train_df, val_df, black_len, white_len)
 
             ## Model Evaluation
             roc_auc, roc_pr = model.evaluate(test_df)
@@ -158,7 +172,7 @@ def baseline():
                 anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
 
         elif MODEL_NAME == 'dplan':
-            former_episode = model.train(train_df, val_df, black_len, white_len)
+            model.train(train_df, val_df, black_len, white_len)
 
             ## Model Evaluation
             roc_auc, roc_pr = model.evaluate(test_df)
@@ -166,6 +180,15 @@ def baseline():
             results.append([dataset_name,seed,
                 anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
 
+        elif MODEL_NAME == 'dynamic_stoc':
+            roc_auc, auc_pr = model.train(
+                train_df = train_df,
+                val_df = val_df,
+                config=CONFIG
+                )
+
+            results.append([dataset_name,seed,
+                anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, auc_pr])
         else:
             model.train(
                 train_df = train_df,
@@ -174,7 +197,7 @@ def baseline():
                 )
 
             ## Model Evaluation
-            roc_auc, roc_pr = model.evaluate(test_df, True)
+            roc_auc, roc_pr = model.evaluate(test_df)
 
             results.append([dataset_name,seed,
                 anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
@@ -196,12 +219,10 @@ def baseline():
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
-    results_df.to_csv(
-        # "./results/{}/{}_setting21_result.csv".format(MODEL_NAME,current_time), index=False)
-        # "./results/{}/{}_setting22_multi_shuttle_rerun_result.csv".format(MODEL_NAME,current_time), index=False)
-        "./results/{}_{}_setting21_result_result.csv".format(MODEL_NAME, current_time), index=False)
+    logger.info(results_df)
 
-    pass
+    results_df.to_csv(
+        "./results/{}/{}_result.csv".format(MODEL_NAME, current_time), index=False)
 
 
 if __name__ == '__main__':

@@ -27,6 +27,7 @@ from .unsupervised import UnsupervisedModel
 # from .devnet import DevNet
 # from .vime import VIME
 from .dads import DADS
+from .stoc import StaticSTOC, DynamicSTOC
 from .dplan import dplan
 #------------------------------------------------------------------------------#
 #                                 Config                                    #
@@ -85,5 +86,13 @@ class BenchmarkBuilder(object):
             model = DADS(config)
         elif model_name == "dplan":
             model = dplan(config)
+        elif model_name == "static_stoc":
+            seed = kwargs.get('seed')
+            dataset_name = kwargs.get('dataset_name')
+            model = StaticSTOC(config, seed=seed, dataset=dataset_name)
+        elif model_name == "dynamic_stoc":
+            seed = kwargs.get('seed')
+            dataset_name = kwargs.get('dataset_name')
+            model = DynamicSTOC(config, seed=seed, dataset=dataset_name)
 
         return model

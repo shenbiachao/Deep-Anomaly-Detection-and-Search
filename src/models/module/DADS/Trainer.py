@@ -16,13 +16,4 @@ class Trainer(object):
     def run_game_for_agent(self):
         """Run the training process several times to calculate the mean and variance of AUC_PR and AUC_ROC"""
         agent = self.agent(self.config, self.environment)
-        if self.config["Actor"]["pretrain"] == 1:
-            agent.pretrain()
-        result_list = agent.run_n_episodes()  # run a single training process
-
-        return result_list
-
-    def print_two_empty_lines(self):
-        print("-----------------------------------------------------------------------------------")
-        print("-----------------------------------------------------------------------------------")
-        print(" ")
+        agent.run_n_episodes()  # run a single training process

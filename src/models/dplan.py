@@ -11,11 +11,8 @@ class dplan(object):
         self.parameter = config
 
     def train(self, train_df, valid_df, black_len, white_len):
-        # print("\n", self.parameter)
         device = self.parameter["device"]
         dataset_a = torch.tensor(train_df.iloc[:black_len, :-1].values.astype(float)).float().to(device)
-        dataset_n = torch.tensor(
-            train_df.iloc[black_len:black_len + white_len, :-1].values.astype(float)).float().to(device)
         dataset_u = torch.tensor(train_df.iloc[black_len + white_len:, :-1].values.astype(float)).float().to(
             device)
 

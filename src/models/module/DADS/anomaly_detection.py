@@ -13,7 +13,7 @@ from .Utility_Functions import RSAMPLE
 
 
 class ad(gym.Env):
-    def __init__(self, train_df, valid_df, test_df, black_len, white_len, parameter, ori_df, dataset_name):
+    def __init__(self, train_df, valid_df, black_len, white_len, parameter):
         self.device = parameter["device"]
         dataset_a = torch.tensor(train_df.iloc[:black_len, :-1].values.astype(float)).float().to(self.device)
         dataset_n = torch.tensor(
@@ -32,12 +32,7 @@ class ad(gym.Env):
         self.dataset_unlabeled_backup = dataset_u
         self.dataset_temp = torch.tensor([]).to(self.device)
         self.valid_df = valid_df
-        self.test_df = test_df
         self.tempdata_confidence = []
-
-        self.x_original = np.array((ori_df.iloc[:, :-1].values.astype(float)))
-        self.y_original = np.array((ori_df.iloc[:, -1].values.astype(float)))
-        self.dataset_name = dataset_name
 
         # initialize current data to be an unlabeled data
         self.current_index = random.randint(0, len(self.dataset_unlabeled) - 1)
@@ -69,8 +64,6 @@ class ad(gym.Env):
     def reset(self):
         self.dataset_anomaly = self.dataset_anomaly_backup
         self.dataset_unlabeled = self.dataset_unlabeled_backup
-        # if len(self.dataset_temp) != 0:
-        #     self.dataset_unlabeled = torch.cat([self.dataset_unlabeled, self.dataset_temp])
         self.dataset_temp = torch.tensor([]).to(self.device)
         self.tempdata_confidence = []
 
@@ -117,8 +110,6 @@ class ad(gym.Env):
 
     def calculate_reward(self, action):
         """ calculate reward based on the class of current data and the action"""
-        choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
-                                  p=self.sampling_method_distribution)[0]
         if self.current_class == 'anomaly':
             if action == 1:
                 score = self.reward_list[0] * self.unsupervised_index(0, self.current_data)
@@ -134,19 +125,11 @@ class ad(gym.Env):
                 score = self.unsupervised_index(0, self.current_data)
             else:
                 score = self.unsupervised_index(0, self.current_data)
-            # if action == 0:
-            #     score = self.reward_list[4]
-            # else:
-            #     score = 0
         elif self.current_class == 'temp':
             if action == 1 and self.tempdata_confidence[self.current_index] >= self.check_num:
                 score = self.reward_list[5] * self.unsupervised_index(0, self.current_data)
             else:
                 score = 0
-            # if action == 1 and self.tempdata_confidence[self.current_index] >= self.check_num:
-            #     score = self.reward_list[5] * self.unsupervised_index(0, self.current_data)
-            # else:
-            #     score = self.unsupervised_index(0, self.current_data)
         else:
             assert 0
 
@@ -158,43 +141,13 @@ class ad(gym.Env):
         self.current_index = random.randint(0, len(self.dataset_anomaly) - 1)
         self.current_data = self.dataset_anomaly[self.current_index]
 
-    def sample_method_two(self):
-        """ random sampling is used in dataset_anomaly"""
-        self.current_class = 'normal'
-        self.current_index = random.randint(0, len(self.dataset_anomaly) - 1)
-        self.current_data = self.dataset_anomaly[self.current_index]
-
-    def sample_method_three(self, action):
+    def sample_method_two(self, action):
         """ random sampling is used in dataset_temp"""
         self.current_class = 'temp'
         self.current_index = random.randint(0, len(self.dataset_temp) - 1)
         self.current_data = self.dataset_temp[self.current_index]
 
-        # self.current_class = 'temp'
-        # true_sample_num = min(self.sample_num, len(self.dataset_temp))
-        # candidate_index = np.random.choice([i for i in range(len(self.dataset_temp))], size=true_sample_num,
-        #                                    replace=False)
-        #
-        # with torch.no_grad():
-        #     mapped_current = self.net.process_hidden_layers(self.current_data).cpu()
-        # if action == 0:
-        #     max_dist = -float('inf')
-        #     for ind in candidate_index:
-        #         dist = np.linalg.norm(mapped_current - self.net.process_hidden_layers(self.dataset_temp[ind]).detach().cpu())
-        #         if dist > max_dist:
-        #             max_dist = dist
-        #             self.current_data = self.dataset_temp[ind]
-        #             self.current_index = ind
-        # else:
-        #     min_dist = float('inf')
-        #     for ind in candidate_index:
-        #         dist = np.linalg.norm(mapped_current - self.net.process_hidden_layers(self.dataset_temp[ind]).detach().cpu())
-        #         if dist < min_dist and dist != 0:
-        #             min_dist = dist
-        #             self.current_data = self.dataset_temp[ind]
-        #             self.current_index = ind
-
-    def sample_method_four(self, action):
+    def sample_method_three(self, action):
         """ Use unsupervised-based method to sample data in dataset_unlabeled
         Each time sample a certain amount of data, then select the one with the highest unsupervised index
         """
@@ -210,25 +163,6 @@ class ad(gym.Env):
         max_index = np.argmax(score)
         self.current_data = candidate[max_index]
         self.current_index = candidate_index[max_index]
-
-        # with torch.no_grad():
-        #     mapped_current = self.net.process_hidden_layers(self.current_data).cpu()
-        # if action == 0:
-        #     max_dist = -float('inf')
-        #     for ind in candidate_index:
-        #         dist = np.linalg.norm(mapped_current - self.net.process_hidden_layers(self.dataset_unlabeled[ind]).detach().cpu())
-        #         if dist > max_dist:
-        #             max_dist = dist
-        #             self.current_data = self.dataset_unlabeled[ind]
-        #             self.current_index = ind
-        # else:
-        #     min_dist = float('inf')
-        #     for ind in candidate_index:
-        #         dist = np.linalg.norm(mapped_current - self.net.process_hidden_layers(self.dataset_unlabeled[ind]).detach().cpu())
-        #         if dist < min_dist and dist != 0:
-        #             min_dist = dist
-        #             self.current_data = self.dataset_unlabeled[ind]
-        #             self.current_index = ind
 
     def refresh_dataset(self, action):
         """ Refresh three dataset according to the data flow rules"""
@@ -261,7 +195,6 @@ class ad(gym.Env):
             action = 0
 
         reward = self.calculate_reward(action)
-        self.tot_reward = self.tot_reward + reward
 
         self.dataset_unlabeled.to(self.device)
         self.tot_steps = self.tot_steps + 1
@@ -270,8 +203,6 @@ class ad(gym.Env):
         done = False
         if self.tot_steps % self.max_trajectory == 0:
             done = True
-            print("Total reward: ", self.tot_reward)
-            self.tot_reward = 0
             self.previous_anomaly_num = len(self.dataset_anomaly)
 
             roc, pr = self.evaluate(self.valid_df, False)
@@ -279,28 +210,16 @@ class ad(gym.Env):
                 self.best_net = copy.deepcopy(self.net)
                 self.best_roc = roc
 
-            # false_count = 0
-            # for j in self.dataset_anomaly:
-            #     temp = self.x_original - np.array(j.cpu())
-            #     temp = np.sum(temp**2, axis=1)
-            #     if self.y_original[np.where(temp<1e-6)] == 0:
-            #         false_count = false_count + 1
-            #
-            # print("Anomaly num: {} --> {}/{}".format(len(self.dataset_anomaly_backup), len(self.dataset_anomaly) - false_count, len(self.dataset_anomaly)))
-
         while True:   # sample next data according to the probablity distribution
-            choice = np.random.choice([0, 1, 2, 3], size=1, p=self.strategy_distribution)[0]
+            choice = np.random.choice([0, 1, 2], size=1, p=self.strategy_distribution)[0]
             if choice == 0 and len(self.dataset_anomaly) != 0:
                 self.sample_method_one()
                 break
-            if choice == 1 and len(self.dataset_normal) != 0:
-                self.sample_method_two()
+            elif choice == 1 and len(self.dataset_temp) > 1:
+                self.sample_method_two(action)
                 break
-            elif choice == 2 and len(self.dataset_temp) > 1:
+            elif choice == 2 and len(self.dataset_unlabeled) != 0:
                 self.sample_method_three(action)
-                break
-            elif choice == 3 and len(self.dataset_unlabeled) != 0:
-                self.sample_method_four(action)
                 break
         return self.current_data, reward, done, " "
 
@@ -314,8 +233,6 @@ class ad(gym.Env):
         else:
             q_values = self.net(x)
         anomaly_score = q_values[:, 0]
-        # q_values = self.net(x)
-        # anomaly_score = q_values[:, 1]
 
         auc_roc = roc_auc_score(y, anomaly_score.cpu().detach())
         precision, recall, _thresholds = precision_recall_curve(y, anomaly_score.cpu().detach())

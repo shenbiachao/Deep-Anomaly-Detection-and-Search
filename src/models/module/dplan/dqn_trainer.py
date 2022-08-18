@@ -213,7 +213,7 @@ class DQNTrainer:
                 auc_roc, auc_pr = self.evaluate(self.valid_df)
                 remaining_seconds = int((self.max_iteration - ite) * np.mean(iteration_durations[-3:]))
                 time_remaining_str = second_to_time_str(remaining_seconds)
-                summary_str = "iteration {}/{}:\ttrain return {:.02f}\ttest return {:02f}\tauc_roc {:02f}\tauc_pr {:02f}\teta: {}".format(
+                summary_str = "iteration {}/{}:\ttrain return {:.02f}\tvalid return {:02f}\tauc_roc {:02f}\tauc_pr {:02f}\teta: {}".format(
                     ite, self.max_iteration, train_traj_rewards[-1], avg_test_reward, auc_roc, auc_pr, time_remaining_str)
                 print(summary_str)
 

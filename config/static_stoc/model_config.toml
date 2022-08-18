@@ -8,5 +8,5 @@
 [MODEL]
 MODEL_TYPE = "isolation_forest"
 MAX_SAMPLES = 256
-K =5
-
+K = 5
+# threshold_dict = {'annthyroid'}
