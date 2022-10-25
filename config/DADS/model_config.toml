@@ -8,11 +8,11 @@ device = "cuda"
 sample_num = 50  # number data sampled when sampling dataset_unlabeled,
 # then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
 max_trajectory = 5000  # number of steps per each episode
-check_num = 8  # threshold of confidence
-reward_list = [1.0, -1.0, 0.5, -0.5, 0.0, 1.0]  # rewards used in calculating reward
+check_num = 9  # threshold of confidence
+reward_list = [1.0, -1.0, 1.0]  # rewards used in calculating reward
 strategy_distribution = [0.2, 0.2, 0.6]  # probability distribution used to choose sampling strategy
-sampling_method_distribution = [0.17, 0.17, 0.16, 0.5]  # probability distribution used to choose unsupervised method
-score_threshold = 0.1
+sampling_method_distribution = [0, 0, 0, 1]  # probability distribution used to choose unsupervised method
+score_threshold = 0.01
 
 [Agent]
 min_steps_before_learning=10000
@@ -28,7 +28,7 @@ automatically_tune_entropy_hyperparameter=true
 entropy_term_weight="None"
 mu=0.0
 theta=0.1
-sigma=0.2
+sigma=0.1
 
 [Agent.Actor]
 learning_rate=0.0005

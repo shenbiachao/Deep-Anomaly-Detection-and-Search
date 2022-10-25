@@ -1,6 +1,5 @@
 import gym
 import numpy as np
-import pandas as pd
 import torch
 import random
 import copy
@@ -16,8 +15,6 @@ class ad(gym.Env):
     def __init__(self, train_df, valid_df, black_len, white_len, parameter):
         self.device = parameter["device"]
         dataset_a = torch.tensor(train_df.iloc[:black_len, :-1].values.astype(float)).float().to(self.device)
-        dataset_n = torch.tensor(
-            train_df.iloc[black_len:black_len + white_len, :-1].values.astype(float)).float().to(self.device)
         dataset_u = torch.tensor(train_df.iloc[black_len + white_len:, :-1].values.astype(float)).float().to(
             self.device)
         # print("Anomaly num: ", len(dataset_a), "   Unlabeled num: ", len(dataset_u), "Normal num: ", len(dataset_n))
@@ -27,7 +24,6 @@ class ad(gym.Env):
         # tempdata_confidence stores the confidence of each data in dataset_temp
         self.dataset_anomaly = dataset_a
         self.dataset_unlabeled = dataset_u
-        self.dataset_normal = dataset_n
         self.dataset_anomaly_backup = dataset_a
         self.dataset_unlabeled_backup = dataset_u
         self.dataset_temp = torch.tensor([]).to(self.device)
@@ -78,6 +74,7 @@ class ad(gym.Env):
         else:
             candidate = self.dataset_unlabeled
         candidate = self.net.process_hidden_layers(candidate).detach().cpu().numpy()
+        self.clf_list[0].fit(candidate)
         for i in range(len(self.clf_list)):
             if self.sampling_method_distribution[i] > 0:
                 clf = self.clf_list[i]
@@ -115,11 +112,6 @@ class ad(gym.Env):
                 score = self.reward_list[0] * self.unsupervised_index(0, self.current_data)
             else:
                 score = self.reward_list[1] * self.unsupervised_index(0, self.current_data)
-        elif self.current_class == 'normal':
-            if action == 0:
-                score = self.reward_list[2]
-            else:
-                score = self.reward_list[3]
         elif self.current_class == 'unlabeled':
             if action == 0:
                 score = self.unsupervised_index(0, self.current_data)
@@ -127,7 +119,7 @@ class ad(gym.Env):
                 score = self.unsupervised_index(0, self.current_data)
         elif self.current_class == 'temp':
             if action == 1 and self.tempdata_confidence[self.current_index] >= self.check_num:
-                score = self.reward_list[5] * self.unsupervised_index(0, self.current_data)
+                score = self.reward_list[2] * self.unsupervised_index(0, self.current_data)
             else:
                 score = 0
         else:
