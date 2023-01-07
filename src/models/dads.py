@@ -15,9 +15,9 @@ class DADS(object):
         trainer.run_game_for_agent()
 
     def evaluate(self, test_df):
-        auc_roc, auc_pr = self.environment.evaluate(test_df, True)
+        auc_roc, auc_pr, p95 = self.environment.evaluate(test_df, True)
 
-        return auc_roc, auc_pr
+        return auc_roc, auc_pr, p95
 
     def save_model(self, export_path):
         """Save SSAD model to export_path."""

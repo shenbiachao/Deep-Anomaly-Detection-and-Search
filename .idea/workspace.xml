@@ -4,14 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="Reformatted">
-      <change afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
+    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="New version">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/benchmark.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/data_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/data_config.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/model_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/model_config.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/main.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/main.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/21_dads_multi_annthyroid.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/21_dads_multi_cardio.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/21_dads_multi_har.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/22_dads_multi_annthyroid.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/22_dads_multi_cardio.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/22_dads_multi_har.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/dads.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/dads.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +73,9 @@
       <module name="DADS-Experiment-main" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="C:\Users\陈超\AppData\Local\Programs\Python\Python37\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -110,7 +118,9 @@
       <workItem from="1661415956816" duration="116000" />
       <workItem from="1665216249284" duration="55208000" />
       <workItem from="1665765671039" duration="799000" />
-      <workItem from="1665794466327" duration="74330000" />
+      <workItem from="1665794466327" duration="94897000" />
+      <workItem from="1667035428480" duration="732000" />
+      <workItem from="1673056231787" duration="2563000" />
     </task>
     <task id="LOCAL-00001" summary="Merge DADS">
       <created>1653478202312</created>
@@ -154,7 +164,14 @@
       <option name="project" value="LOCAL" />
       <updated>1660836832032</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="New version">
+      <created>1666683829858</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1666683829859</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,6 +195,7 @@
     <MESSAGE value="maybe this can work" />
     <MESSAGE value="dads experiment 2.1" />
     <MESSAGE value="Reformatted" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reformatted" />
+    <MESSAGE value="New version" />
+    <option name="LAST_COMMIT_MESSAGE" value="New version" />
   </component>
 </project>

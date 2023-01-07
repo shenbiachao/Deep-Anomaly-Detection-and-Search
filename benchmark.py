@@ -165,11 +165,11 @@ def baseline():
             model.train(train_df, val_df, black_len, white_len)
 
             ## Model Evaluation
-            roc_auc, roc_pr = model.evaluate(test_df)
-            print("test roc: {}, test pr: {}".format(roc_auc, roc_pr))
+            roc_auc, roc_pr, p95 = model.evaluate(test_df)
+            print("test roc: {}, test pr: {}, test p95: {}".format(roc_auc, roc_pr, p95))
 
             results.append([dataset_name,seed,
-                anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr])
+                anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr, p95])
 
         elif MODEL_NAME == 'dplan':
             model.train(train_df, val_df, black_len, white_len)
@@ -205,17 +205,17 @@ def baseline():
         ## Save results
         results_df = pd.DataFrame(results)
         results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
-                                'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr']
+                                'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95']
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         print(current_time)
 
-        results_df.to_csv("./results/5sample100_{}_{}.csv".format(MODEL_NAME, dataset_name), index=False)
+        results_df.to_csv("./results/randomsample_search_{}.csv".format(MODEL_NAME), index=False)
 
     ## Save results
     results_df = pd.DataFrame(results)
     results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
-        'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr']
+        'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95']
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
