@@ -46,14 +46,11 @@ class Base_Agent(object):
         while self.episode_number < self.hyperparameters["num_episodes_to_run"]:
             self.reset_game()
             self.step()  # here step functon will complete a single training episode
-            val_auc_roc, val_auc_pr = self.eval()
-            # res = "Episode {}: auc_roc {:.03f} auc_pr {:.03f}".format(self.episode_number, auc_roc,
-            #                                                           auc_pr) + "\nanomaly: {} temp: {} unlabeled: {} normal: {}".format(
-            #     len(self.environment.dataset_anomaly), len(self.environment.dataset_temp),
-            #     len(self.environment.dataset_unlabeled), len(self.environment.dataset_normal))
-            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f}".format(self.episode_number, val_auc_roc,
-                                                                      val_auc_pr)
+            val_auc_roc, val_auc_pr, val_p95 = self.eval()
+            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f} val_p95 {:.03f}".format(self.episode_number, val_auc_roc,
+                                                                      val_auc_pr, val_p95)
             print(res)
+            print("searched anomalies: ", self.environment.searched_anomalies)
 
     def conduct_action(self, action):
         self.next_state, self.reward, self.done, _ = self.environment.step(action)

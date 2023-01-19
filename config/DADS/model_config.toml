@@ -5,14 +5,15 @@
 # Example:
 [Environment]
 device = "cpu"
-sample_num = 10  # number data sampled when sampling dataset_unlabeled,
+sample_num = 20  # number data sampled when sampling dataset_unlabeled,
 # then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
 max_trajectory = 5000  # number of steps per each episode
 check_num = 9  # threshold of confidence
 reward_list = [1.0, -1.0, 1.0]  # rewards used in calculating reward
-strategy_distribution = [0.2, 0.2, 0.6]  # probability distribution used to choose sampling strategy
 sampling_method_distribution = [0, 0, 0, 1]  # probability distribution used to choose unsupervised method
+anomaly_ratio = 0.05
 score_threshold = 0.1
+eval_interval = 1000
 
 [Agent]
 min_steps_before_learning=10000

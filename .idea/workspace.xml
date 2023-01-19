@@ -4,19 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="New version">
+    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="before making large modification on sampling function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/benchmark.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/data_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/data_config.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/model_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/model_config.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/main.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/main.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/21_dads_multi_annthyroid.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/21_dads_multi_cardio.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/21_dads_multi_har.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/22_dads_multi_annthyroid.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/22_dads_multi_cardio.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/22_dads_multi_har.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/dads.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/dads.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/Base_Agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/Base_Agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/SAC.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/SAC.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/Utility_Functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/Utility_Functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +46,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
@@ -120,7 +116,9 @@
       <workItem from="1665765671039" duration="799000" />
       <workItem from="1665794466327" duration="94897000" />
       <workItem from="1667035428480" duration="732000" />
-      <workItem from="1673056231787" duration="2563000" />
+      <workItem from="1673056231787" duration="39062000" />
+      <workItem from="1673352137871" duration="38564000" />
+      <workItem from="1674111189347" duration="623000" />
     </task>
     <task id="LOCAL-00001" summary="Merge DADS">
       <created>1653478202312</created>
@@ -171,7 +169,14 @@
       <option name="project" value="LOCAL" />
       <updated>1666683829859</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="before making large modification on sampling function">
+      <created>1673060619078</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1673060619078</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,6 +201,7 @@
     <MESSAGE value="dads experiment 2.1" />
     <MESSAGE value="Reformatted" />
     <MESSAGE value="New version" />
-    <option name="LAST_COMMIT_MESSAGE" value="New version" />
+    <MESSAGE value="before making large modification on sampling function" />
+    <option name="LAST_COMMIT_MESSAGE" value="before making large modification on sampling function" />
   </component>
 </project>

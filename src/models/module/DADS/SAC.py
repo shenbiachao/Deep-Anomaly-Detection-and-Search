@@ -75,7 +75,7 @@ class SAC(Base_Agent):
             if not eval_ep: self.save_experience(experience=(self.state, self.action, self.reward, self.next_state, self.done))
             self.state = self.next_state
             self.global_step_number += 1
-        self.environment.net = self.actor_local
+            self.environment.net = self.actor_local
         self.episode_number += 1
 
     def pick_action(self, eval_ep, state=None):
@@ -106,7 +106,9 @@ class SAC(Base_Agent):
 
     def produce_action_and_action_info(self, state):
         """Given the state, produces an action, the log probability of the action, and the tanh of the mean action"""
+        # self.actor_local.eval()
         actor_output = self.actor_local(state)
+        # self.actor_local.train()
         mean, log_std = actor_output[:, :self.action_size], actor_output[:, self.action_size:]
         std = log_std.exp()
         normal = Normal(mean, std)

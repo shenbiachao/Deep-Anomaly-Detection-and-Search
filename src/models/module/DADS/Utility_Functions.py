@@ -543,3 +543,23 @@ class NN(nn.Module, Base_Network):
             if out is None: out = temp_output
             else: out = torch.cat((out, temp_output), dim=1)
         return out
+
+class Singleton:
+    def __new__(cls, *arg, **kwargs):
+        if not hasattr(cls, "_instance"):
+            cls._instance = super(Singleton, cls).__new__(cls)
+        return cls._instance
+
+
+class Logger(Singleton):
+    logger = None
+
+    def __init__(self):
+        self.base_idx = 0
+
+    def set_log(self, logger):
+        self.logger = logger
+
+    def log(self, key, value, idx):
+        if self.logger is not None:
+            self.logger.add_scalar(key, value, idx+self.base_idx)

@@ -24,7 +24,7 @@ NORMALIES_RATIO = [0]
 
 # Setting 2.1
 [2-1.DATA]
-DATASETS = ['multi_annthyroid', 'multi_cardio', 'multi_har']
+DATASETS = ['multi_har']
 # SEEDS = [1,20,42,50,99,101,135,145,165,200]
 SEEDS = [1,20,42,50,99]
 
