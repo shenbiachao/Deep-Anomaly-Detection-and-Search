@@ -4,26 +4,27 @@
 
 # Example:
 [Environment]
-device = "cpu"
-sample_num = 20  # number data sampled when sampling dataset_unlabeled,
+device = "cuda"
+sample_num = 5  # number data sampled when sampling dataset_unlabeled,
 # then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
-max_trajectory = 5000  # number of steps per each episode
-check_num = 9  # threshold of confidence
-reward_list = [1.0, -1.0, 1.0]  # rewards used in calculating reward
-sampling_method_distribution = [0, 0, 0, 1]  # probability distribution used to choose unsupervised method
-anomaly_ratio = 0.05
+max_trajectory = 1000  # number of steps per each episode
+check_num = 10  # threshold of confidence
+search_percentage = 0.5
+reward_list = [1.0, -1.0, 1.0, 0.1]  # rewards used in calculating reward
+sampling_method_distribution = [1.0]  # probability distribution used to choose unsupervised method
+anomaly_ratio = 0.2
 score_threshold = 0.1
 eval_interval = 1000
 
 [Agent]
-min_steps_before_learning=10000
+min_steps_before_learning=5000
 batch_size=64
 update_every_n_steps=16
 learning_updates_per_learning_session=16
 add_extra_noise=false
 discount_rate=0.99
 num_episodes_to_run=10   # episodes per training
-device="cpu"
+device="cuda"
 
 automatically_tune_entropy_hyperparameter=true
 entropy_term_weight="None"

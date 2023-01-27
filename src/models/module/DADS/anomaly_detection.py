@@ -3,9 +3,6 @@ import numpy as np
 import torch
 import random
 from gym import spaces
-from pyod.models.iforest import IForest
-from pyod.models.ocsvm import OCSVM
-from pyod.models.hbos import HBOS
 from sklearn.metrics import roc_auc_score, precision_recall_curve, auc
 from .Utility_Functions import RSAMPLE, Logger
 from torch.utils.tensorboard import SummaryWriter
@@ -33,12 +30,13 @@ class ad(gym.Env):
         self.current_data = self.dataset[self.current_index]
 
         self.observation_space = spaces.Discrete(self.current_data.size()[0])
-        self.action_space = spaces.Discrete(2)
+        self.action_space = spaces.Box(0, 1, shape=(1, ), dtype=np.float32)
         self.tot_steps = 0
 
         self.sample_num = parameter["sample_num"]
         self.max_trajectory = parameter["max_trajectory"]
         self.check_num = parameter["check_num"]
+        self.search_percentage = parameter["search_percentage"]
         self.reward_list = parameter["reward_list"]
         self.sampling_method_distribution = parameter["sampling_method_distribution"]
         self.score_threshold = parameter["score_threshold"]
@@ -51,29 +49,29 @@ class ad(gym.Env):
         self.best_roc = 0
         self.tot_reward = 0
 
-        # choose the following six methods as unsupervised anomaly datection method
-        self.clf_list = [IForest(), HBOS(), OCSVM(), RSAMPLE()]
-
         self.logger = Logger()
         current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         self.logger.set_log(SummaryWriter(log_dir="./log/" + current_time))
 
-    def reset(self):
-        self.current_index = random.randint(0, len(self.dataset) - 1)
-        self.current_data = self.dataset[self.current_index]
+        self.clf_list = [RSAMPLE()]
+        self.anomaly_score_list = []
 
-        if len(self.dataset_unlabeled) > 5000:
-            candidate_index = np.random.choice([i for i in range(len(self.dataset_unlabeled))], size=5000,
-                                               replace=False)
-            candidate = self.dataset_unlabeled[candidate_index]
-        else:
-            candidate = self.dataset_unlabeled
-        candidate = self.net.process_hidden_layers(candidate).detach().cpu().numpy()
+        labels = [0] * len(self.dataset_unlabeled)
+        for _ in range(self.anomaly_repeat_times):
+            labels = labels + [1] * len(self.dataset_anomaly)
         for i in range(len(self.clf_list)):
             if self.sampling_method_distribution[i] > 0:
                 clf = self.clf_list[i]
-                clf.fit(candidate)
+                clf.fit(self.dataset.cpu())
 
+                self.anomaly_score_list.append(clf.decision_scores_.tolist())
+                if self.logger.base_idx == 0:
+                    print(clf.__class__, roc_auc_score(labels, clf.decision_scores_))
+            else:
+                self.anomaly_score_list.append([0] * len(self.dataset))
+        self.anomaly_score_list = np.array(self.anomaly_score_list)
+
+    def reset(self):
         if self.searched_anomalies > 0.5 * len(self.dataset_anomaly):
             self.check_num = self.check_num + 1
         elif self.searched_anomalies == 0:
@@ -85,30 +83,7 @@ class ad(gym.Env):
 
         self.logger.base_idx = self.logger.base_idx + self.max_trajectory
 
-        self.distance_matrix = np.zeros([len(self.dataset_anomaly), len(self.dataset)])
-        mapped_anomaly = self.net.process_hidden_layers(self.dataset_anomaly).detach().numpy()
-        mapped_dataset = self.net.process_hidden_layers(self.dataset).detach().numpy()
-        for i in range(len(mapped_anomaly)):
-            for j in range(len(mapped_dataset)):
-                self.distance_matrix[i][j] = np.linalg.norm(mapped_anomaly[i] - mapped_dataset[j])
-
         return self.current_data
-
-    def unsupervised_index(self, type_index, data):
-        """ return anomaly index of a data using one of six unsupervised method defined in __init__
-        the returned value is normalized to range [0, 1]
-        @param type_index: the index of unsupervised detecto, if type_index>=len(self.clf_list), random sampling method will be applied
-        @param data: data needs to be calculated, both single data or multiple data is acceptable
-        """
-        mapped_data = self.net.process_hidden_layers(data).detach().cpu().numpy()
-        clf = self.clf_list[type_index]
-        if len(data.shape) == 1:
-            r = clf.predict_proba(mapped_data.reshape(1, -1))[0][1]
-        else:
-            r = np.array(clf.predict_proba(mapped_data))[:, 1]
-        data.to(self.device)
-
-        return r
 
     def calculate_reward(self, action):
         """ calculate reward based on the class of current data and the action"""
@@ -119,27 +94,22 @@ class ad(gym.Env):
                 score = self.reward_list[1]
         elif self.confidence[self.current_index] == self.check_num - 1 and action == 1:
             score = self.reward_list[2]
+        elif self.confidence[self.current_index] < self.check_num - 1 and action == 0:
+            score = self.reward_list[3]
         else:
             score = 0
 
         return score
 
     def sampling_function(self, action):
-        # candidate_index = np.random.choice([i for i in range(len(self.dataset))], size=self.sample_num,
-        #                                    replace=False)
-        # candidate = self.dataset[candidate_index]
-        #
-        # choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
-        #                           p=self.sampling_method_distribution)[0]
-        # score = self.unsupervised_index(choice, candidate)
-        # max_index = np.argmax(score)
-        # self.current_data = candidate[max_index]
-        # self.current_index = candidate_index[max_index]
-
         candidate_index = np.random.choice([i for i in range(len(self.dataset))], size=self.sample_num,
                                            replace=False)
-        distance = self.distance_matrix[:, candidate_index]
-        self.current_index = candidate_index[np.argmin(np.min(distance, axis=1))]
+
+        choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
+                                  p=self.sampling_method_distribution)[0]
+        score = self.anomaly_score_list[choice][candidate_index]
+        max_index = np.argmax(score)
+        self.current_index = candidate_index[max_index]
         self.current_data = self.dataset[self.current_index]
 
     def refresh(self, action):
@@ -166,11 +136,6 @@ class ad(gym.Env):
             done = True
             self.searched_anomalies = sum(
                 i >= self.check_num for i in self.confidence) - self.anomaly_repeat_times * len(self.dataset_anomaly)
-
-            # roc, pr, p95 = self.evaluate(self.valid_df, False)
-            # if roc > self.best_roc:
-            #     self.best_net = copy.deepcopy(self.net)
-            #     self.best_roc = roc
 
         self.sampling_function(action)
 

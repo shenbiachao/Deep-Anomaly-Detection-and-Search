@@ -116,10 +116,10 @@ def set_random_seeds(random_seed):
 
 class RSAMPLE:
     def __init__(self):
-        pass
+        self.decision_scores_ = []
 
     def fit(self, data):
-        pass
+        self.decision_scores_ = np.array([random.random() for _ in range(len(data))])
 
     def predict_proba(self, data):
         if len(data.shape) == 1:

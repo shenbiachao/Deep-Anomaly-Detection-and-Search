@@ -2,8 +2,15 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="db33c24a-8512-46c6-887e-272a20b096e6" name="cc">
+      <webServer id="db33c24a-8512-46c6-887e-272a20b096e6" name="lamda5-z0">
         <fileTransfer rootFolder="/home/cc" accessType="SFTP" host="210.28.134.96" port="22" sshConfigId="72b3c9f1-ee26-446e-a936-ba06c62961c0" sshConfig="cc@210.28.134.96:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="52603c60-86bf-4aa8-9570-f60e4d71fe0b" name="lamda5-z2">
+        <fileTransfer rootFolder="/home/cc" accessType="SFTP" host="114.212.20.201" port="22" sshConfigId="503cb2f4-34fc-45b7-b5c7-2cda6749219d" sshConfig="cc@114.212.20.201:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
