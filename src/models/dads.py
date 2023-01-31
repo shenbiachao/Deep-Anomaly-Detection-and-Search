@@ -8,9 +8,9 @@ class DADS(object):
         """Init DADS instance."""
         self.parameter = config
 
-    def train(self, train_df, valid_df, black_len, white_len):
+    def train(self, train_df, valid_df, black_len, white_len, contamination, dataset_name):
         AGENT = SAC
-        self.environment = ad(train_df, valid_df, black_len, white_len, self.parameter["Environment"])
+        self.environment = ad(train_df, valid_df, black_len, white_len, contamination, dataset_name, self.parameter["Environment"])
         trainer = Trainer(self.parameter["Agent"], AGENT, self.environment)
         trainer.run_game_for_agent()
 

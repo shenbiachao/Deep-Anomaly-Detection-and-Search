@@ -40,7 +40,7 @@ import sys
 import glob
 import toml
 from datetime import datetime
-
+import argparse
 import pandas as pd
 from tqdm import tqdm
 
@@ -52,12 +52,41 @@ from src.datasets.semi_supervised_ad_loader import TabularData
 #                                 PARAMETERS                                   #
 #------------------------------------------------------------------------------#
 
-MODEL_NAME = str(sys.argv[1])
-setting = str(sys.argv[2])
+parser = argparse.ArgumentParser(description='dads')
+parser.add_argument('--sample_num', type=int)
+parser.add_argument('--max_trajectory', type=int)
+parser.add_argument('--check_num', type=int)
+parser.add_argument('--search_percentage', type=float)
+parser.add_argument('--reward_list', type=float, nargs="+")
+parser.add_argument('--sampling_method_distribution', type=float)
+parser.add_argument('--anomaly_ratio', type=float)
+parser.add_argument('--score_threshold', type=float)
+
+parser.add_argument('--model', type=str, default="dads")
+parser.add_argument('--setting', type=str, default="tune")
+
+args = parser.parse_args()
+MODEL_NAME = args.model
+setting = args.setting
 
 CONFIG_LIST = glob.glob("./config/{}/*.toml".format(MODEL_NAME))
 CONFIG = toml.load(CONFIG_LIST)
 
+# change_str = ""
+# for item in vars(args):
+#     if getattr(args, item) and item != "model" and item != "setting":
+#         if item == "sampling_method_distribution":
+#             CONFIG["Environment"][str(item)] = [getattr(args, item), 1-getattr(args, item)]
+#         else:
+#             CONFIG["Environment"][str(item)] = getattr(args, item)
+#         if item != "check_num":
+#             change_str = change_str + str(item) + "_" + str(getattr(args, item)) + "_"
+# if CONFIG["Environment"]["check_num"] == 100:
+#     change_str = change_str + "nosearch"
+# else:
+#     change_str = change_str + "search"
+# print(change_str)
+change_str = "unsup_test_ecod_append"
 
 ## Hyperparameter
 
@@ -162,7 +191,7 @@ def baseline():
             del model
 
         elif MODEL_NAME == 'dads':
-            model.train(train_df, val_df, black_len, white_len)
+            model.train(train_df, val_df, black_len, white_len, comtaination_ratio, dataset_name)
 
             ## Model Evaluation
             roc_auc, roc_pr, p95 = model.evaluate(test_df)
@@ -210,7 +239,7 @@ def baseline():
         current_time = now.strftime("%H:%M:%S")
         print(current_time)
 
-        results_df.to_csv("./results/random_sample(1000stepnormal0.01)_search(5datasets)_{}.csv".format(MODEL_NAME), index=False)
+        results_df.to_csv("./results/{}.csv".format(change_str), index=False)
 
     ## Save results
     results_df = pd.DataFrame(results)

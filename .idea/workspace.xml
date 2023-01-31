@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="">
+    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="before adding parameter tuning">
+      <change afterPath="$PROJECT_DIR$/tune_anomaly_ratio.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tune_reward_list.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tune_sampling.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tune_score_threshold.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tune_search_percentage.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/sshConfigs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sshConfigs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
@@ -12,9 +17,8 @@
       <change beforePath="$PROJECT_DIR$/benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/benchmark.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/data_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/data_config.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/model_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/model_config.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/Utility_Functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/Utility_Functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/dads.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/dads.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/trainer.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +55,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="29byqtQ8GLsUpm3HN32909zcbsD" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -77,6 +83,11 @@
     <force-push-targets>
       <force-push-target remote-path="origin" branch="main" />
     </force-push-targets>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\科研\DADS-Experiment" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="Experiment" type="PythonConfigurationType" factoryName="Python">
@@ -133,7 +144,7 @@
       <workItem from="1673056231787" duration="39062000" />
       <workItem from="1673352137871" duration="38564000" />
       <workItem from="1674111189347" duration="623000" />
-      <workItem from="1674656132828" duration="52400000" />
+      <workItem from="1674656132828" duration="130756000" />
     </task>
     <task id="LOCAL-00001" summary="Merge DADS">
       <created>1653478202312</created>
@@ -191,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673060619078</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="before adding parameter tuning">
+      <created>1674822669033</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1674822669033</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,6 +235,7 @@
     <MESSAGE value="Reformatted" />
     <MESSAGE value="New version" />
     <MESSAGE value="before making large modification on sampling function" />
-    <option name="LAST_COMMIT_MESSAGE" value="before making large modification on sampling function" />
+    <MESSAGE value="before adding parameter tuning" />
+    <option name="LAST_COMMIT_MESSAGE" value="before adding parameter tuning" />
   </component>
 </project>

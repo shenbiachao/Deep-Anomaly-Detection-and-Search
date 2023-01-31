@@ -16,6 +16,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="aa17f7e9-1718-4725-afc4-e22913c62fcb" name="lamda5-z3">
+        <fileTransfer rootFolder="/home/cc" accessType="SFTP" host="114.212.21.40" port="22" sshConfigId="4b8900b2-613f-4877-9220-798175311fc1" sshConfig="cc@114.212.21.40:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

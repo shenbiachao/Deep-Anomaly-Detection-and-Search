@@ -3,6 +3,10 @@ import numpy as np
 import torch
 import random
 from gym import spaces
+from pyod.models.hbos import HBOS
+from pyod.models.iforest import IForest
+from pyod.models.ecod import ECOD
+from pyod.models.ocsvm import OCSVM
 from sklearn.metrics import roc_auc_score, precision_recall_curve, auc
 from .Utility_Functions import RSAMPLE, Logger
 from torch.utils.tensorboard import SummaryWriter
@@ -12,7 +16,7 @@ import datetime
 
 
 class ad(gym.Env):
-    def __init__(self, train_df, valid_df, black_len, white_len, parameter):
+    def __init__(self, train_df, valid_df, black_len, white_len, contamination, dataset_name, parameter):
         self.device = parameter["device"]
         self.dataset_anomaly = torch.tensor(train_df.iloc[:black_len, :-1].values.astype(float)).float().to(self.device)
         self.dataset_unlabeled = torch.tensor(train_df.iloc[black_len + white_len:, :-1].values.astype(float)).float().to(
@@ -36,11 +40,14 @@ class ad(gym.Env):
         self.sample_num = parameter["sample_num"]
         self.max_trajectory = parameter["max_trajectory"]
         self.check_num = parameter["check_num"]
-        self.search_percentage = parameter["search_percentage"]
         self.reward_list = parameter["reward_list"]
         self.sampling_method_distribution = parameter["sampling_method_distribution"]
         self.score_threshold = parameter["score_threshold"]
         self.eval_interval = parameter["eval_interval"]
+
+        self.up_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["up_search_percentage"]
+        self.low_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["low_search_percentage"]
+        print("Search range:", (self.low_search_num, self.up_search_num))
 
         self.searched_anomalies = 0
 
@@ -53,35 +60,31 @@ class ad(gym.Env):
         current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         self.logger.set_log(SummaryWriter(log_dir="./log/" + current_time))
 
-        self.clf_list = [RSAMPLE()]
-        self.anomaly_score_list = []
-
-        labels = [0] * len(self.dataset_unlabeled)
-        for _ in range(self.anomaly_repeat_times):
-            labels = labels + [1] * len(self.dataset_anomaly)
-        for i in range(len(self.clf_list)):
-            if self.sampling_method_distribution[i] > 0:
-                clf = self.clf_list[i]
-                clf.fit(self.dataset.cpu())
-
-                self.anomaly_score_list.append(clf.decision_scores_.tolist())
-                if self.logger.base_idx == 0:
-                    print(clf.__class__, roc_auc_score(labels, clf.decision_scores_))
-            else:
-                self.anomaly_score_list.append([0] * len(self.dataset))
-        self.anomaly_score_list = np.array(self.anomaly_score_list)
+        unsup_method = {'annthyroid': HBOS(), 'cardio': ECOD(), 'satimage2': HBOS(), 'satellite': HBOS(),
+                        'thyroid': HBOS(), 'multi_shuttle': ECOD(), 'multi_cardio': ECOD(), 'multi_har': ECOD(),
+                        'multi_annthyroid': HBOS()}
+        clf = unsup_method[dataset_name]
+        clf.fit(self.dataset.cpu())
+        self.anomaly_score_list = np.array(clf.decision_scores_.tolist())
+        self.pre_sample_method = "random"
+        print("Unsupervised method: ", clf.__class__)
 
     def reset(self):
-        if self.searched_anomalies > 0.5 * len(self.dataset_anomaly):
+        if self.searched_anomalies > self.up_search_num:
             self.check_num = self.check_num + 1
-        elif self.searched_anomalies == 0:
+        elif self.searched_anomalies < self.low_search_num:
             self.check_num = self.check_num - 1
         print("check num: ", self.check_num)
+
         self.confidence = [0] * len(self.dataset_unlabeled)
         for _ in range(self.anomaly_repeat_times):
             self.confidence = self.confidence + [self.check_num] * len(self.dataset_anomaly)
 
         self.logger.base_idx = self.logger.base_idx + self.max_trajectory
+
+        self.current_index = random.randint(0, len(self.dataset) - 1)
+        self.current_data = self.dataset[self.current_index]
+        self.pre_sample_method = "random"
 
         return self.current_data
 
@@ -95,22 +98,30 @@ class ad(gym.Env):
         elif self.confidence[self.current_index] == self.check_num - 1 and action == 1:
             score = self.reward_list[2]
         elif self.confidence[self.current_index] < self.check_num - 1 and action == 0:
-            score = self.reward_list[3]
+            if self.pre_sample_method == "random":
+                score = self.reward_list[3]
+            else:
+                score = 0
         else:
             score = 0
 
         return score
 
     def sampling_function(self, action):
-        candidate_index = np.random.choice([i for i in range(len(self.dataset))], size=self.sample_num,
-                                           replace=False)
-
-        choice = np.random.choice([i for i in range(len(self.clf_list))], size=1,
+        choice = np.random.choice([i for i in range(2)], size=1,
                                   p=self.sampling_method_distribution)[0]
-        score = self.anomaly_score_list[choice][candidate_index]
-        max_index = np.argmax(score)
-        self.current_index = candidate_index[max_index]
-        self.current_data = self.dataset[self.current_index]
+        if choice == 0:
+            self.pre_sample_method = "random"
+            self.current_index = random.randint(0, len(self.dataset)-1)
+            self.current_data = self.dataset[self.current_index]
+        else:
+            self.pre_sample_method = "unsup"
+            candidate_index = np.random.choice([i for i in range(len(self.dataset))], size=self.sample_num,
+                                               replace=False)
+            score = self.anomaly_score_list[candidate_index]
+            max_index = np.argmax(score)
+            self.current_index = candidate_index[max_index]
+            self.current_data = self.dataset[self.current_index]
 
     def refresh(self, action):
         if self.confidence[self.current_index] < self.check_num:
@@ -170,3 +181,12 @@ class ad(gym.Env):
                 break
 
         return auc_roc, auc_pr, fpr[idx]
+
+    def evaluate_unsup(self, clf):
+        x = torch.tensor(self.valid_df.iloc[:, :-1].values.astype(float)).float().cpu()
+        y = list(self.valid_df.iloc[:, -1].values.astype(float))
+
+        y_hat = [i[1] for i in clf.predict_proba(x)]
+        auc_roc = roc_auc_score(y, y_hat)
+
+        return auc_roc
