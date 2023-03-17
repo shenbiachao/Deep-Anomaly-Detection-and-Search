@@ -1,4 +1,4 @@
-for anomaly_ratio in 0.4 0.5 1.0;
+for anomaly_ratio in 0.005;
 do
   for check_num in 10 100;
   do

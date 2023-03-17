@@ -1,4 +1,4 @@
-for score_threshold in 0.01 0.1 0.5 0.9 0.99;
+for score_threshold in 0.01 0.99;
 do
   for check_num in 10 100;
   do

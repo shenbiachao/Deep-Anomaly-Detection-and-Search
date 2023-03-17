@@ -72,21 +72,20 @@ setting = args.setting
 CONFIG_LIST = glob.glob("./config/{}/*.toml".format(MODEL_NAME))
 CONFIG = toml.load(CONFIG_LIST)
 
-# change_str = ""
-# for item in vars(args):
-#     if getattr(args, item) and item != "model" and item != "setting":
-#         if item == "sampling_method_distribution":
-#             CONFIG["Environment"][str(item)] = [getattr(args, item), 1-getattr(args, item)]
-#         else:
-#             CONFIG["Environment"][str(item)] = getattr(args, item)
-#         if item != "check_num":
-#             change_str = change_str + str(item) + "_" + str(getattr(args, item)) + "_"
-# if CONFIG["Environment"]["check_num"] == 100:
-#     change_str = change_str + "nosearch"
-# else:
-#     change_str = change_str + "search"
-# print(change_str)
-change_str = "unsup_test_ecod_append"
+change_str = ""
+for item in vars(args):
+    if getattr(args, item) and item != "model" and item != "setting":
+        if item == "sampling_method_distribution":
+            CONFIG["Environment"][str(item)] = [getattr(args, item), 1-getattr(args, item)]
+        else:
+            CONFIG["Environment"][str(item)] = getattr(args, item)
+        if item != "check_num":
+            change_str = change_str + str(item) + "_" + str(getattr(args, item)) + "_"
+if CONFIG["Environment"]["check_num"] == 100:
+    change_str = change_str + "nosearch"
+else:
+    change_str = change_str + "search"
+print(change_str)
 
 ## Hyperparameter
 
@@ -241,17 +240,17 @@ def baseline():
 
         results_df.to_csv("./results/{}.csv".format(change_str), index=False)
 
-    ## Save results
-    results_df = pd.DataFrame(results)
-    results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
-        'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95']
-
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    logger.info(results_df)
-
-    results_df.to_csv(
-        "./results/{}_{}_result.csv".format(MODEL_NAME, current_time), index=False)
+    # ## Save results
+    # results_df = pd.DataFrame(results)
+    # results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
+    #     'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95']
+    #
+    # now = datetime.now()
+    # current_time = now.strftime("%H:%M:%S")
+    # logger.info(results_df)
+    #
+    # results_df.to_csv(
+    #     "./results/{}_{}_result.csv".format(MODEL_NAME, current_time), index=False)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ from torch.utils.tensorboard import SummaryWriter
 from sklearn import metrics
 import copy
 import datetime
+import matplotlib.pyplot as plt
 
 
 class ad(gym.Env):
@@ -45,8 +46,10 @@ class ad(gym.Env):
         self.score_threshold = parameter["score_threshold"]
         self.eval_interval = parameter["eval_interval"]
 
-        self.up_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["up_search_percentage"]
-        self.low_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["low_search_percentage"]
+        # self.up_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["up_search_percentage"]
+        # self.low_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["low_search_percentage"]
+        self.up_search_num = min(contamination, 0.04) * self.max_trajectory * parameter["search_percentage"]
+        self.low_search_num = self.up_search_num / 2
         print("Search range:", (self.low_search_num, self.up_search_num))
 
         self.searched_anomalies = 0
@@ -61,13 +64,15 @@ class ad(gym.Env):
         self.logger.set_log(SummaryWriter(log_dir="./log/" + current_time))
 
         unsup_method = {'annthyroid': HBOS(), 'cardio': ECOD(), 'satimage2': HBOS(), 'satellite': HBOS(),
-                        'thyroid': HBOS(), 'multi_shuttle': ECOD(), 'multi_cardio': ECOD(), 'multi_har': ECOD(),
+                        'thyroid': HBOS(), 'multi_shuttle': OCSVM(), 'multi_cardio': ECOD(), 'multi_har': ECOD(),
                         'multi_annthyroid': HBOS()}
         clf = unsup_method[dataset_name]
         clf.fit(self.dataset.cpu())
         self.anomaly_score_list = np.array(clf.decision_scores_.tolist())
         self.pre_sample_method = "random"
         print("Unsupervised method: ", clf.__class__)
+
+        # self.touch_num = [0] * (len(self.dataset_anomaly) + len(self.dataset_unlabeled))
 
     def reset(self):
         if self.searched_anomalies > self.up_search_num:
@@ -85,6 +90,8 @@ class ad(gym.Env):
         self.current_index = random.randint(0, len(self.dataset) - 1)
         self.current_data = self.dataset[self.current_index]
         self.pre_sample_method = "random"
+
+        # self.touch_num = [0] * (len(self.dataset_anomaly) + len(self.dataset_unlabeled))
 
         return self.current_data
 
@@ -123,6 +130,12 @@ class ad(gym.Env):
             self.current_index = candidate_index[max_index]
             self.current_data = self.dataset[self.current_index]
 
+        # if self.current_index > self.anomaly_repeat_times * len(self.dataset_anomaly):
+        #     touch_index = self.current_index - self.anomaly_repeat_times * len(self.dataset_anomaly)
+        # else:
+        #     touch_index = self.current_index % len(self.dataset_anomaly)
+        # self.touch_num[touch_index] = self.touch_num[touch_index] + 1
+
     def refresh(self, action):
         if self.confidence[self.current_index] < self.check_num:
             if action == 1:
@@ -147,6 +160,10 @@ class ad(gym.Env):
             done = True
             self.searched_anomalies = sum(
                 i >= self.check_num for i in self.confidence) - self.anomaly_repeat_times * len(self.dataset_anomaly)
+
+            # plt.bar(np.arange(len(self.touch_num)), self.touch_num)
+            # plt.savefig(str(self.sampling_method_distribution[0])+"sampling.png")
+            # assert 0
 
         self.sampling_function(action)
 
