@@ -4,19 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="before conducting full experiment">
-      <change afterPath="$PROJECT_DIR$/tune_sampling_distribution.sh" afterDir="false" />
+    <list default="true" id="0c4168c2-dd97-4762-ac72-ecb872d68663" name="Changes" comment="before adding search accuracy test">
+      <change afterPath="$PROJECT_DIR$/scripts/tune_pretrain_steps.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sshConfigs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sshConfigs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/benchmark.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/data_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/data_config.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/DADS/model_config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/DADS/model_config.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/datasets/semi_supervised_ad_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/datasets/semi_supervised_ad_loader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/dads.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/dads.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/Base_Agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/Base_Agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/module/DADS/Trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/Trainer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/module/DADS/anomaly_detection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tune_anomaly_ratio.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tune_anomaly_ratio.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tune_reward_list.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tune_reward_list.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tune_sampling.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tune_sample_num.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tune_score_threshold.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tune_score_threshold.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tune_search_percentage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tune_search_percentage.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_anomaly_ratio.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tune_anomaly_ratio.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_reward_list.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tune_reward_list.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_sample_num.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tune_sample_num.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_sampling_distribution.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tune_sampling_distribution.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_score_threshold.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tune_score_threshold.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tune_search_percentage.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tune_search_percentage.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,6 +94,10 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\科研\DADS-Experiment" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\科研\DADS-Experiment" />
+      <recent name="E:\科研\DADS-Experiment\scripts" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="Experiment" type="PythonConfigurationType" factoryName="Python">
@@ -147,7 +159,24 @@
       <workItem from="1675429177705" duration="15000" />
       <workItem from="1678625498816" duration="6905000" />
       <workItem from="1678711660670" duration="11962000" />
-      <workItem from="1678863830092" duration="19307000" />
+      <workItem from="1678863830092" duration="60753000" />
+      <workItem from="1679318401137" duration="4091000" />
+      <workItem from="1679379345935" duration="15065000" />
+      <workItem from="1679535761761" duration="11679000" />
+      <workItem from="1679637232097" duration="39942000" />
+      <workItem from="1679971973176" duration="12136000" />
+      <workItem from="1680277175966" duration="6148000" />
+      <workItem from="1680333617960" duration="19947000" />
+      <workItem from="1680578635918" duration="1203000" />
+      <workItem from="1680584198425" duration="7958000" />
+      <workItem from="1680856348288" duration="7247000" />
+      <workItem from="1680881073436" duration="19000" />
+      <workItem from="1680927902684" duration="3166000" />
+      <workItem from="1681037103647" duration="15000" />
+      <workItem from="1681183633181" duration="11762000" />
+      <workItem from="1681279866731" duration="20936000" />
+      <workItem from="1681434972679" duration="1195000" />
+      <workItem from="1681527707228" duration="4423000" />
     </task>
     <task id="LOCAL-00001" summary="Merge DADS">
       <created>1653478202312</created>
@@ -219,7 +248,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675140526387</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="before adding search accuracy test">
+      <created>1679033412299</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1679033412299</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -247,6 +283,7 @@
     <MESSAGE value="before making large modification on sampling function" />
     <MESSAGE value="before adding parameter tuning" />
     <MESSAGE value="before conducting full experiment" />
-    <option name="LAST_COMMIT_MESSAGE" value="before conducting full experiment" />
+    <MESSAGE value="before adding search accuracy test" />
+    <option name="LAST_COMMIT_MESSAGE" value="before adding search accuracy test" />
   </component>
 </project>

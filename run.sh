@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python3 benchmark.py dads 1-1
+python3 benchmark.py --model dads --setting 1-1

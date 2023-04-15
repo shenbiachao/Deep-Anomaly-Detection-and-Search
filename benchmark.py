@@ -61,6 +61,8 @@ parser.add_argument('--reward_list', type=float, nargs="+")
 parser.add_argument('--sampling_method_distribution', type=float)
 parser.add_argument('--anomaly_ratio', type=float)
 parser.add_argument('--score_threshold', type=float)
+parser.add_argument('--search_score_threshold', type=float)
+parser.add_argument('--min_steps_before_searching', type=int)
 
 parser.add_argument('--model', type=str, default="dads")
 parser.add_argument('--setting', type=str, default="tune")
@@ -72,20 +74,11 @@ setting = args.setting
 CONFIG_LIST = glob.glob("./config/{}/*.toml".format(MODEL_NAME))
 CONFIG = toml.load(CONFIG_LIST)
 
-change_str = ""
+change_str = MODEL_NAME + "_" + setting
 for item in vars(args):
-    if getattr(args, item) and item != "model" and item != "setting":
-        if item == "sampling_method_distribution":
-            CONFIG["Environment"][str(item)] = [getattr(args, item), 1-getattr(args, item)]
-        else:
-            CONFIG["Environment"][str(item)] = getattr(args, item)
-        if item != "check_num":
-            change_str = change_str + str(item) + "_" + str(getattr(args, item)) + "_"
-if CONFIG["Environment"]["check_num"] == 100:
-    change_str = change_str + "nosearch"
-else:
-    change_str = change_str + "search"
-print(change_str)
+    if getattr(args, item) is not None and item != "model" and item != "setting":
+        CONFIG["Environment"][str(item)] = getattr(args, item)
+        change_str = change_str + str(item) + "_" + str(getattr(args, item))
 
 ## Hyperparameter
 
@@ -148,7 +141,7 @@ def baseline():
             all_normal_classes = CONFIG[setting]['MULTI_CLASS_AD_SETTING']['NORMAL_CLASSES'][dataset_name]
             known_anomaly_class = CONFIG[setting]['MULTI_CLASS_AD_SETTING']['KNOWN_ANOMALY_CLASS'][dataset_name]
 
-            train_df, val_df, test_df, black_len, white_len, ori_df = TabularData.semi_supervised_multi_class_ad_sampling(
+            train_df, val_df, test_df, black_len, white_len, ground_truth, ori_df = TabularData.semi_supervised_multi_class_ad_sampling(
                 df, seed = seed, anomalies_fraction = anomalies_fraction
                 , normalies_ratio = normalies_ratio
                 , comtaination_ratio = comtaination_ratio
@@ -157,7 +150,7 @@ def baseline():
                 )
 
         else:
-            train_df, val_df, test_df, black_len, white_len, ori_df= TabularData.semi_supervised_ad_sampling(
+            train_df, val_df, test_df, black_len, white_len, ground_truth, ori_df= TabularData.semi_supervised_ad_sampling(
                 df, seed = seed, anomalies_fraction = anomalies_fraction
                 , normalies_ratio = normalies_ratio
                 , comtaination_ratio = comtaination_ratio
@@ -190,14 +183,14 @@ def baseline():
             del model
 
         elif MODEL_NAME == 'dads':
-            model.train(train_df, val_df, black_len, white_len, comtaination_ratio, dataset_name)
+            search_acc, search_hit = model.train(train_df, val_df, black_len, white_len, comtaination_ratio, dataset_name, ground_truth)
 
             ## Model Evaluation
             roc_auc, roc_pr, p95 = model.evaluate(test_df)
-            print("test roc: {}, test pr: {}, test p95: {}".format(roc_auc, roc_pr, p95))
+            print("test roc: {}, test pr: {}, test p95: {}\n search_acc: {}, search_hit: {}".format(roc_auc, roc_pr, p95, search_acc, search_hit))
 
             results.append([dataset_name,seed,
-                anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr, p95])
+                anomalies_fraction, normalies_ratio, comtaination_ratio, roc_auc, roc_pr, p95, search_acc, search_hit])
 
         elif MODEL_NAME == 'dplan':
             model.train(train_df, val_df, black_len, white_len)
@@ -233,24 +226,25 @@ def baseline():
         ## Save results
         results_df = pd.DataFrame(results)
         results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
-                                'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95']
+                                'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95', 'search_acc', 'search_hit']
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         print(current_time)
 
         results_df.to_csv("./results/{}.csv".format(change_str), index=False)
 
-    # ## Save results
-    # results_df = pd.DataFrame(results)
-    # results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
-    #     'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95']
-    #
-    # now = datetime.now()
-    # current_time = now.strftime("%H:%M:%S")
-    # logger.info(results_df)
-    #
-    # results_df.to_csv(
-    #     "./results/{}_{}_result.csv".format(MODEL_NAME, current_time), index=False)
+    ## Save results
+    results_df = pd.DataFrame(results)
+    results_df.columns = ['dataset_name', 'seed', 'anomalies_fraction',
+        'normalies_ratio', 'comtaination_ratio', 'roc_auc', 'roc_pr', 'p95', 'search_acc', 'search_hit']
+
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    logger.info(results_df)
+
+    print(change_str)
+    results_df.to_csv(
+        "./results/{}_{}_result.csv".format(MODEL_NAME, current_time), index=False)
 
 
 if __name__ == '__main__':

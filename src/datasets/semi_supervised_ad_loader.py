@@ -288,6 +288,7 @@ class TabularData(PytorchDataset):
 
         ## Add unlabled black adata into unlabeld white train data
         unlabeled_train_df = pd.concat([unlabeled_black_train_df2,unlabeled_white_train_df])
+        ground_truth = list(unlabeled_train_df.iloc[:, -1])
         unlabeled_train_df['label'] = 0
 
         ## Step 4: finally: concat labeled black training data and comtainnated unlabeled data as final train size
@@ -297,7 +298,7 @@ class TabularData(PytorchDataset):
         val_df.reset_index(inplace=True, drop=True)
         test_df.reset_index(inplace=True, drop=True)
 
-        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio), train_df
+        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio), ground_truth, train_df
 
     @classmethod
     def concat_dataset(cls, dataset1, dataset2):
@@ -446,6 +447,7 @@ class TabularData(PytorchDataset):
         
         ## Add unlabled black adata into unlabeld white train data
         unlabeled_train_df = pd.concat([unlabeled_black_train_df2,unlabeled_white_train_df])
+        ground_truth = list(unlabeled_train_df.iloc[:, -1])
         unlabeled_train_df['label'] = 0
 
         ## Step 4: finally: concat labeled black training data and comtainnated unlabeled data as final train size
@@ -459,7 +461,7 @@ class TabularData(PytorchDataset):
         val_df['label'] = val_df['label'].apply(lambda x: 0 if x ==0 else 1)
         test_df['label'] = test_df['label'].apply(lambda x: 0 if x ==0 else 1)
 
-        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio), train_df
+        return train_df2, val_df, test_df, labeled_black_sample_size, int(labeled_black_sample_size * normalies_ratio), ground_truth, train_df
 
 def test():
     """

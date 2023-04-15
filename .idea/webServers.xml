@@ -10,7 +10,7 @@
         </fileTransfer>
       </webServer>
       <webServer id="52603c60-86bf-4aa8-9570-f60e4d71fe0b" name="lamda5-z2">
-        <fileTransfer rootFolder="/home/cc" accessType="SFTP" host="114.212.20.201" port="22" sshConfigId="503cb2f4-34fc-45b7-b5c7-2cda6749219d" sshConfig="cc@114.212.20.201:22 password">
+        <fileTransfer rootFolder="/home/cc" accessType="SFTP" host="114.212.22.174" port="22" sshConfigId="503cb2f4-34fc-45b7-b5c7-2cda6749219d" sshConfig="cc@114.212.22.174:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

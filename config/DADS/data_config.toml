@@ -56,12 +56,13 @@ NORMAL_CLASSES = {'multi_annthyroid'=[3], 'multi_cardio'=[1], 'multi_shuttle'=[1
 
 # tune
 [tune.DATA]
-DATASETS = ['annthyroid', 'multi_annthyroid']
-SEEDS = [1,20,42,50,99]
+# DATASETS = ['multi_shuttle','satimage2','satellite','thyroid']
+DATASETS = ['multi_cardio','multi_annthyroid','multi_har','multi_shuttle']
+SEEDS = [1,20,42,50,99,101,135,145,165,200]
 
 [tune.SEMI_SUPERVISED_SETTING]
 ANOMALIES_FRACTION = [0.1]
-COMTAINATION_RATIO = [0.0, 0.04, 0.1, 0.2]
+COMTAINATION_RATIO = [0.04]
 NORMALIES_RATIO = [0]
 
 [tune.MULTI_CLASS_AD_SETTING]

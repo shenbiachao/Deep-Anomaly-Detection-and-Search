@@ -8,16 +8,18 @@ device = "cpu"
 sample_num = 10  # number data sampled when sampling dataset_unlabeled,
 # then choose the one with the highest unsupervised index (e.g. the one with the highest Iforest anomaly score)
 max_trajectory = 5000  # number of steps per each episode
-check_num = 100  # threshold of confidence
+check_num = 3  # threshold of confidence
 search_percentage = 0.5
-reward_list = [1.0, -1.0, 1.0, 0.5]  # rewards used in calculating reward
-sampling_method_distribution = [0.6, 0.4]  # probability distribution used to choose unsupervised method
+reward_list = [1.0, -1.0, 1.0, 0.5, 0.1]  # rewards used in calculating reward
+sampling_method_distribution = [0.7, 0.3]  # probability distribution used to choose unsupervised method
 anomaly_ratio = 0.2
 score_threshold = 0.1
+search_score_threshold = 0.2
 eval_interval = 500
+min_steps_before_searching = 10000
 
 [Agent]
-min_steps_before_learning=10000
+min_steps_before_learning=5000
 batch_size=64
 update_every_n_steps=16
 learning_updates_per_learning_session=16

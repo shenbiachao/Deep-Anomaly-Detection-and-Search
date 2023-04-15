@@ -47,10 +47,15 @@ class Base_Agent(object):
             self.reset_game()
             self.step()  # here step functon will complete a single training episode
             val_auc_roc, val_auc_pr, val_p95 = self.eval()
-            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f} val_p95 {:.03f}".format(self.episode_number, val_auc_roc,
-                                                                      val_auc_pr, val_p95)
+            res = "Episode {}: val_auc_roc {:.03f} val_auc_pr {:.03f} val_p95 {:.03f}".format(self.episode_number,
+                                                                                              val_auc_roc,
+                                                                                              val_auc_pr, val_p95)
             print(res)
-            print("searched anomalies: ", self.environment.searched_anomalies)
+            print("correct/upper_searched_anomalies/total searched anomalies: {}/{}/{}".format(
+                self.environment.correct_search_num, self.environment.upper_search_num,
+                self.environment.searched_anomalies))
+
+        return self.environment.correct_search_num, self.environment.upper_search_num, self.environment.searched_anomalies
 
     def conduct_action(self, action):
         self.next_state, self.reward, self.done, _ = self.environment.step(action)
